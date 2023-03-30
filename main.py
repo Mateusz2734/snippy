@@ -163,7 +163,7 @@ def quickselect(T, p, r, i):
 
 @click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
-    """Copy to clipboard"""
+    """Copy algorithms to clipboard"""
     pass
 
 
