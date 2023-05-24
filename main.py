@@ -358,6 +358,111 @@ def floyd_warshall(graph):
                 distance[u][v] = min(distance[u][v], distance[u][k] + distance[k][v])
 
     return distance""",
+    "bellman_ford": """# Złożoność: O(V*E)
+# Działa na liście krawędzi
+from math import inf
+
+
+def relax(G, d, par, j):
+    if d[G[j][1]] > d[G[j][0]] + G[j][2]:
+        d[G[j][1]] = d[G[j][0]] + G[j][2]
+        par[G[j][1]] = G[j][0]
+
+
+def bellman_ford(G, s):
+    V = 0
+    for i in range(len(G)):
+        V = max(V, G[i][0], G[i][1])
+    E = len(G)
+
+    distance = [inf for _ in range(V + 1)]
+    parent = [None for _ in range(V + 1)]
+    distance[s] = 0
+
+    for i in range(V - 1):
+        for j in range(E):
+            relax(G, distance, parent, j)
+    for i in range(E):
+        if distance[G[i][1]] > distance[G[i][0]] + G[i][2]:
+            return False, None, None
+    return True, distance, parent
+
+
+graph = [
+    (0, 1, 6),
+    (0, 2, 7),
+    (1, 2, 8),
+    (1, 3, 5),
+    (1, 4, -4),
+    (2, 3, -3),
+    (2, 4, 9),
+    (3, 1, -2),
+    (4, 0, 2),
+    (4, 3, 7),
+]
+    """,
+    "list_prim": """# Złożoność: O(ElogV)
+from queue import PriorityQueue
+from math import inf
+
+
+def list_prim(G, s):
+    n = len(G)
+    queue = PriorityQueue()
+
+    parent = [None for _ in range(n)]
+    distance = [inf for _ in range(n)]
+    visited = [False for _ in range(n)]
+
+    distance[s] = 0
+    visited[s] = True
+    queue.put((0, s))
+
+    while not queue.empty():
+        _, u = queue.get()
+        visited[u] = True
+        for v in G[u]:
+            if distance[v[0]] > v[1] and not visited[v[0]]:
+                parent[v[0]] = u
+                distance[v[0]] = v[1]
+                queue.put((distance[v[0]], v[0]))
+
+    result = []
+    for i in range(len(parent)):
+        if parent[i] is not None:
+            result.append((i, parent[i], distance[i]))
+    return result""",
+    "matrix_prim": """# Złożoność: O(V^2)
+from queue import PriorityQueue
+from math import inf
+
+
+def matrix_prim(G, s):
+    n = len(G)
+
+    queue = PriorityQueue()
+    parent = [None for _ in range(n)]
+    distance = [inf for _ in range(n)]
+    visited = [False for _ in range(n)]
+    
+    distance[s] = 0
+    visited[s] = True
+    queue.put((0, s))
+    
+    while not queue.empty():
+        _, u = queue.get()
+        visited[u] = True
+        for i in range(len(G)):
+            if G[u][i] != 0 and distance[i] > G[u][i] and not visited[i]:
+                parent[i] = u
+                distance[i] = G[u][i]
+                queue.put((distance[i], i))
+
+    result = []
+    for i in range(len(parent)):
+        if parent[i] is not None:
+            result.append((i, parent[i], distance[i]))
+    return result""",
 }
 
 
@@ -460,4 +565,22 @@ def find_bridges():
 @cli.command()
 def floyd_warshall():
     pyperclip.copy(to_copy["floyd_warshall"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def bellman_ford():
+    pyperclip.copy(to_copy["bellman_ford"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def list_prim():
+    pyperclip.copy(to_copy["list_prim"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def matrix_prim():
+    pyperclip.copy(to_copy["matrix_prim"])
     click.echo("Copied!")
