@@ -261,6 +261,103 @@ def ford_fulkerson(M, s, t):
 
         my_path = find_path(G, s, t)
     return flow""",
+    "list_dfs": """# Złożoność: O(V + E)
+    def DFS(G, s):
+    visited = [False for _ in range(len(G))]
+    result = [s]
+
+    def dfs_visit(u, G, visited, result):
+        visited[u] = True 
+        for v in G[u]:
+            if not visited[v]:
+                result.append(v)
+                dfs_visit(v, G, visited, result)
+
+    dfs_visit(s, G, visited, result)
+    return result""",
+    "matrix_dfs": """#Złożoność: O(V^2)
+    def DFS(G, s):
+    visited = [False for _ in range(len(G))]
+    result = []
+    dfs_visit(s, G, visited, result)
+    return result
+
+
+def dfs_visit(u, G, visited, result):
+    visited[u] = True
+    result.append(u)
+    for i in range(len(G)):
+        if visited[i] is False and G[u][i] == 1:
+            dfs_visit(i, G, visited, result)""",
+    "find_cycle": """# Złożoność: O(V + E) (Jak DFS)
+def detect_cycle(G, s):
+    visited = [False for _ in range(len(G))]
+    parent = [None for _ in range(len(G))]
+    return dfs(G, s, visited, parent)
+
+
+def dfs(G, s, visited, parent):
+    visited[s] = True
+    for v in G[s]:
+        if not visited[v]:
+            parent[v] = s
+            return dfs(G, v, visited, parent)
+        elif visited[v] and parent[s] != v:
+            return True
+    return False""",
+    "find_bridges": """# Złożoność: O(V(V + E))
+from math import inf
+
+
+def bridge(G):
+    n = len(G)
+    visited = [False for _ in range(n)]
+    time_visit = [0 for _ in range(n)]
+    low = [inf for _ in range(n)]
+    parent = [None for _ in range(n)]
+    time = 0
+
+    bridges = []
+    for i in range(n):
+        if not visited[i]:
+            dfs(G, i, visited, parent, time_visit, time, low)
+    for i in range(n):
+        if time_visit[i] == low[i] and parent[i] is not None:
+            bridges.append((parent[i], i))
+    return bridges
+
+
+def dfs(G, s, visited, parent, time_visit, time, low):
+    visited[s] = True
+    time_visit[s] = time
+    time += 1
+    low[s] = time_visit[s]
+    for v in G[s]:
+        if not visited[v]:
+            parent[v] = s
+            dfs(G, v, visited, parent, time_visit, time, low)
+            low[s] = min(low[s], low[v])
+        elif parent[s] != v:
+            low[s] = min(low[s], time_visit[v])
+""",
+    "floyd_warshall": """# Złożoność: O(V^3)
+def floyd_warshall(graph):
+    n = len(graph)
+    distance = [[inf for _ in range(n)] for _ in range(n)]
+
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                distance[i][j] = 0
+            elif graph[i][j] != 0:
+                distance[i][j] = graph[i][j]
+
+    for k in range(n):
+        for u in range(n):
+            for v in range(n):
+                distance[u][v] = min(distance[u][v], distance[u][k] + distance[k][v])
+
+    return distance""",
 }
 
 
@@ -319,6 +416,18 @@ def list_bfs():
 
 
 @cli.command()
+def list_dfs():
+    pyperclip.copy(to_copy["list_dfs"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def matrix_dfs():
+    pyperclip.copy(to_copy["matrix_dfs"])
+    click.echo("Copied!")
+
+
+@cli.command()
 def topological_sort():
     pyperclip.copy(to_copy["topological_sort"])
     click.echo("Copied!")
@@ -333,4 +442,22 @@ def dijkstra():
 @cli.command()
 def ford_fulkerson():
     pyperclip.copy(to_copy["ford_fulkerson"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def find_cycle():
+    pyperclip.copy(to_copy["find_cycle"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def find_bridges():
+    pyperclip.copy(to_copy["find_bridges"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def floyd_warshall():
+    pyperclip.copy(to_copy["floyd_warshall"])
     click.echo("Copied!")
