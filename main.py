@@ -387,18 +387,12 @@ def bellman_ford(G, s):
             return False, None, None
     return True, distance, parent
 
-
+# Przykładowy graf
 graph = [
     (0, 1, 6),
     (0, 2, 7),
     (1, 2, 8),
     (1, 3, 5),
-    (1, 4, -4),
-    (2, 3, -3),
-    (2, 4, 9),
-    (3, 1, -2),
-    (4, 0, 2),
-    (4, 3, 7),
 ]
     """,
     "list_prim": """# Złożoność: O(ElogV)
