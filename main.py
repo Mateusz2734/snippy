@@ -456,7 +456,27 @@ def matrix_prim(G, s):
     for i in range(len(parent)):
         if parent[i] is not None:
             result.append((i, parent[i], distance[i]))
-    return result""",
+    return result""", "euler": """# Złożoność: O(V^2) (macierz)
+def dfs(G, s, result: list):
+    for i in range(len(G)):
+        if G[s][i] == 1:
+            G[s][i], G[i][s] = 0, 0
+            dfs(G, i, result)
+    result.append(s)
+
+
+def euler_path(G):
+    n = len(G)
+    edges = 0
+    for i in range(n):
+        for j in range(n):
+            if G[i][j] == 1:
+                edges += 1
+    if edges % 2 == 1:
+        return False
+    result = []
+    dfs(G, 0, result)
+    return result[::-1]"""
 }
 
 
