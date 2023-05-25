@@ -225,7 +225,7 @@ def dijkstra(G, s):
     queue = PriorityQueue()
     queue.put((d[s], s))
 
-    while queue:
+    while not queue.empty():
         du, u = queue.get()
         if d[u] == du:
             for v, l in G[u]:
