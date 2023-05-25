@@ -456,7 +456,8 @@ def matrix_prim(G, s):
     for i in range(len(parent)):
         if parent[i] is not None:
             result.append((i, parent[i], distance[i]))
-    return result""", "euler": """# Złożoność: O(V^2) (macierz)
+    return result""",
+    "euler": """# Złożoność: O(V^2) (macierz)
 def dfs(G, s, result: list):
     for i in range(len(G)):
         if G[s][i] == 1:
@@ -476,7 +477,7 @@ def euler_path(G):
         return False
     result = []
     dfs(G, 0, result)
-    return result[::-1]"""
+    return result[::-1]""",
 }
 
 
@@ -597,4 +598,10 @@ def list_prim():
 @cli.command()
 def matrix_prim():
     pyperclip.copy(to_copy["matrix_prim"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def euler():
+    pyperclip.copy(to_copy["euler"])
     click.echo("Copied!")
