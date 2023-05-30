@@ -478,6 +478,60 @@ def euler_path(G):
     result = []
     dfs(G, 0, result)
     return result[::-1]""",
+    "list_kruskal": """# Złożoność: O(ELogV)
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.rank = 0
+        self.parent = self
+
+
+def find(x: Node):
+    if x != x.parent:
+        x.parent = find(x.parent)
+    return x.parent
+
+
+def union(x: Node, y: Node):
+    x = find(x)
+    y = find(y)
+    if x == y:
+        return
+    if x.rank > y.rank:
+        y.parent = x
+    else:
+        x.parent = y
+        if x.rank == y.rank:
+            y.rank += 1
+
+
+def make_set(v):
+    return Node(v)
+
+
+def convert_to_edges(G):
+    E = []
+    for i in range(len(G)):
+        for j in range(len(G[i])):
+            if (G[i][j][0], i, G[i][j][1]) not in E:
+                E.append((i, G[i][j][0], G[i][j][1]))
+    return E
+
+
+def kruskal(G):
+    E = convert_to_edges(G)
+    E.sort(key=lambda x: x[2])
+    MST = []
+    V = []
+    for i in range(len(G)):
+        V.append(make_set(i))
+    for i in range(len(E)):
+        u = E[i][0]
+        v = E[i][1]
+        if find(V[u]) != find(V[v]):
+            MST.append(E[i])
+            union(V[u], V[v])
+    return MST""",
 }
 
 
@@ -604,4 +658,10 @@ def matrix_prim():
 @cli.command()
 def euler():
     pyperclip.copy(to_copy["euler"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def list_kruskal():
+    pyperclip.copy(to_copy["list_kruskal"])
     click.echo("Copied!")
