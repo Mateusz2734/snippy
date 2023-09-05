@@ -690,4 +690,185 @@ def euler_path(G):
     dfs(G, 0, result)
     return result[::-1]
 """)
+    return result[::-1]""",
+    "list_kruskal": """# Złożoność: O(ELogV)
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.rank = 0
+        self.parent = self
+
+
+def find(x: Node):
+    if x != x.parent:
+        x.parent = find(x.parent)
+    return x.parent
+
+
+def union(x: Node, y: Node):
+    x = find(x)
+    y = find(y)
+    if x == y:
+        return
+    if x.rank > y.rank:
+        y.parent = x
+    else:
+        x.parent = y
+        if x.rank == y.rank:
+            y.rank += 1
+
+
+def make_set(v):
+    return Node(v)
+
+
+def convert_to_edges(G):
+    E = []
+    for i in range(len(G)):
+        for j in range(len(G[i])):
+            if (G[i][j][0], i, G[i][j][1]) not in E:
+                E.append((i, G[i][j][0], G[i][j][1]))
+    return E
+
+
+def kruskal(G):
+    E = convert_to_edges(G)
+    E.sort(key=lambda x: x[2])
+    MST = []
+    V = []
+    for i in range(len(G)):
+        V.append(make_set(i))
+    for i in range(len(E)):
+        u = E[i][0]
+        v = E[i][1]
+        if find(V[u]) != find(V[v]):
+            MST.append(E[i])
+            union(V[u], V[v])
+    return MST""",
+}
+
+
+@click.group(context_settings=CONTEXT_SETTINGS)
+def cli():
+    """Copy algorithms to clipboard"""
+    pass
+
+
+@cli.command()
+def quicksort():
+    pyperclip.copy(to_copy["quicksort"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def heapsort():
+    pyperclip.copy(to_copy["heapsort"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def mergesort():
+    pyperclip.copy(to_copy["mergesort"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def countingsort():
+    pyperclip.copy(to_copy["countingsort"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def bubblesort():
+    pyperclip.copy(to_copy["bubblesort"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def quickselect():
+    pyperclip.copy(to_copy["quickselect"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def matrix_bfs():
+    pyperclip.copy(to_copy["matrix_bfs"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def list_bfs():
+    pyperclip.copy(to_copy["list_bfs"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def list_dfs():
+    pyperclip.copy(to_copy["list_dfs"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def matrix_dfs():
+    pyperclip.copy(to_copy["matrix_dfs"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def topological_sort():
+    pyperclip.copy(to_copy["topological_sort"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def dijkstra():
+    pyperclip.copy(to_copy["dijkstra"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def ford_fulkerson():
+    pyperclip.copy(to_copy["ford_fulkerson"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def find_cycle():
+    pyperclip.copy(to_copy["find_cycle"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def find_bridges():
+    pyperclip.copy(to_copy["find_bridges"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def floyd_warshall():
+    pyperclip.copy(to_copy["floyd_warshall"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def bellman_ford():
+    pyperclip.copy(to_copy["bellman_ford"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def list_prim():
+    pyperclip.copy(to_copy["list_prim"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def matrix_prim():
+    pyperclip.copy(to_copy["matrix_prim"])
+    click.echo("Copied!")
+
+
+@cli.command()
+def euler():
+    pyperclip.copy(to_copy["euler"])
     click.echo("Copied!")
