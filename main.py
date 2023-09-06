@@ -755,7 +755,7 @@ def kruskal(G):
     click.echo("Copied!")
 
 
-@click.command()
+@cli.command()
 def binary_search():
     pyperclip.copy("""
 def binary_search(arr, val):
@@ -780,7 +780,7 @@ def binary_search(arr, val):
     click.echo("Copied!")
 
 
-@click.command()
+@cli.command()
 def knapsack():
     pyperclip.copy("""
 from typing import List
@@ -805,7 +805,7 @@ def knapsack(weights: List[int], profits: List[int], capacity: int):
     click.echo("Copied!")
 
 
-@click.command()
+@cli.command()
 def interval_tree():
     pyperclip.copy("""
 from math import inf
@@ -936,7 +936,7 @@ class SegmentTree:
     click.echo("Copied!")
 
 
-@click.command()
+@cli.command()
 def bst_from_arr():
     pyperclip.copy("""
 class Node:
