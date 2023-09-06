@@ -803,3 +803,134 @@ def knapsack(weights: List[int], profits: List[int], capacity: int):
 
 """)
     click.echo("Copied!")
+
+
+@click.command()
+def interval_tree():
+    pyperclip.copy("""
+from math import inf
+
+
+class ITNode:
+    def __init__(self, root, key, l_span, r_span):
+        self.key = key
+        self.left = None
+        self.right = None
+        self.parent = root
+        self.intervals = []
+        self.left_span = l_span
+        self.right_span = r_span
+
+
+class IntervalTree:
+    def __init__(self, T):
+        self.root = self.build_tree(T, None, 0, len(T) - 1, -inf, inf)
+
+    def add_interval(self, interval):
+        self._add(self.root, interval)
+
+    def _add(self, root: ITNode, interval):
+        if root.key is None:
+            root.intervals.append(interval)
+        elif root.key >= interval[1]:
+            self._add(root.left, interval)
+        elif root.key <= interval[0]:
+            self._add(root.right, interval)
+        elif interval[0] <= root.key <= interval[1]:
+            if root.left_span >= interval[0] and root.right_span <= interval[1]:
+                root.intervals.append(interval)
+            else:
+                self._add(root.left, interval)
+                self._add(root.right, interval)
+
+    def point_query(self, point):
+        result = []
+        root = self.root
+
+        while root is not None:
+            for i in range(len(root.intervals)):
+                result.append(root.intervals[i])
+            if root.key is None or root.key == point:
+                return result
+            if point < root.key:
+                root = root.left
+            else:
+                root = root.right
+
+    def build_tree(self, T, root, a, b, l_span, r_span):
+        if b < a:
+            return ITNode(root, None, l_span, r_span)
+        mid = (a + b) // 2
+        new_node = ITNode(root, T[mid], l_span, r_span)
+        if mid - a - 1 >= 0:
+            new_node.left = self.build_tree(
+                T, new_node, a, mid - 1, new_node.left_span, new_node.key
+            )
+        else:
+            new_node.left = ITNode(root, None, new_node.left_span, new_node.key)
+        if b - mid - 1 >= 0:
+            new_node.right = self.build_tree(
+                T, new_node, mid + 1, b, new_node.key, new_node.right_span
+            )
+        else:
+            new_node.right = ITNode(root, None, new_node.key, new_node.right_span)
+        return new_node
+""")
+    click.echo("Copied!")
+
+
+@cli.command()
+def segment_tree():
+    pyperclip.copy("""
+class SegmentTree:
+    def __init__(self, T, operation=lambda a, b: a + b):
+        self.n = len(T)
+        self.tree = [0 for _ in range(2 * self.n)]
+        self.operation = operation
+
+        self.build_tree(T)
+
+    # O(n)
+    def build_tree(self, T):
+        n = self.n
+
+        for i in range(n):
+            self.tree[n + i] = T[i]
+
+        for i in range(n - 1, 0, -1):
+            self.tree[i] = self.operation(self.tree[2*i], self.tree[2*i+1])
+
+    # O(logn)
+    def update(self, i, x):
+        n = self.n
+
+        self.tree[i + n] = x
+        i += n
+
+        while i > 1:
+            self.tree[i // 2] = self.operation(self.tree[i], self.tree[i ^ 1])
+            i //= 2
+
+    # [l, r)
+    # O(logn)
+    def query(self, l, r):
+        res = 0
+
+        l += self.n
+        r += self.n
+
+        while l < r:
+            if l % 2 == 1:
+                res = self.operation(res, self.tree[l])
+                l += 1
+
+            if r % 2 == 1:
+                r -= 1
+                res = self.operation(res, self.tree[r])
+
+            l //= 2
+            r //= 2
+
+        return res
+""")
+    click.echo("Copied!")
