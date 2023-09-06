@@ -777,3 +777,28 @@ def binary_search(arr, val):
     return -1
 """)
     click.echo("Copied!")
+
+
+@click.command()
+def knapsack():
+    pyperclip.copy("""
+from typing import List
+
+
+def knapsack(weights: List[int], profits: List[int], capacity: int):
+    n = len(weights)
+
+    dp = [[0 for _ in range(capacity+1)] for _ in range(n)]
+
+    for b in range(weights[0], capacity+1):
+        dp[0][b] = profits[0]
+
+    for b in range(capacity+1):
+        for i in range(1, n):
+            dp[i][b] = dp[i-1][b]
+            if b - weights[i] >= 0:
+                dp[i][b] = max(dp[i][b], dp[i-1][b-weights[i]]+profits[i])
+    return dp[n-1][capacity]
+
+""")
+    click.echo("Copied!")
