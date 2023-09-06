@@ -934,3 +934,29 @@ class SegmentTree:
         return res
 """)
     click.echo("Copied!")
+
+
+@click.command()
+def bst_from_arr():
+    pyperclip.copy("""
+class Node:
+    def __init__(self, val):
+        self.val = val
+        self.left = None
+        self.right = None
+
+
+def arr_to_BST(T, l, r):
+    if l > r:
+        return None
+
+    mid = (l + r) // 2
+
+    root = Node(T[mid])
+
+    root.left = arr_to_BST(T, l, mid - 1)
+    root.right = arr_to_BST(T, mid + 1, r)
+
+    return root
+""")
+    click.echo("Copied!")
