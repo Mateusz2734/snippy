@@ -524,6 +524,7 @@ from math import inf
 
 
 # Złożoność: O(V^3)
+# Działa na macierzy sąsiedztwa    
 def floyd_warshall(graph):
     n = len(graph)
     distance = [[inf for _ in range(n)] for _ in range(n)]
