@@ -752,3 +752,28 @@ def kruskal(G):
     return MST
 """)
     click.echo("Copied!")
+
+
+@click.command()
+def binary_search():
+    pyperclip.copy("""
+def binary_search(arr, val):
+    low = 0
+    high = len(arr) - 1
+    mid = 0
+
+    while low <= high:
+
+        mid = (high + low) // 2
+
+        if arr[mid] < val:
+            low = mid + 1
+
+        elif arr[mid] > val:
+            high = mid - 1
+
+        else:
+            return mid
+    return -1
+""")
+    click.echo("Copied!")
