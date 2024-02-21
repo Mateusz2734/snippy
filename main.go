@@ -23,10 +23,10 @@ func main() {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:  "browse",
-				Usage: "browse snippets",
+				Name:  "list",
+				Usage: "list snippets",
 				Action: func(cCtx *cli.Context) error {
-					fmt.Println("browse snippets")
+					fmt.Println("list snippets")
 					return nil
 				},
 			},
@@ -51,6 +51,14 @@ func main() {
 				Usage: "get snippet",
 				Action: func(cCtx *cli.Context) error {
 					fmt.Println("get snippet")
+					return nil
+				},
+			},
+			{
+				Name:  "delete",
+				Usage: "delete snippet",
+				Action: func(cCtx *cli.Context) error {
+					fmt.Println("delete snippet")
 					return nil
 				},
 			},
