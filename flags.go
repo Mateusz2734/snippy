@@ -7,7 +7,7 @@ func WithInputFile(state *State) cli.Flag {
 		Name:        "file",
 		Usage:       "Set the content from `FILE` as the snippet.",
 		Aliases:     []string{"f"},
-		Destination: &state.InFile,
+		Destination: &state.InputFile,
 	}
 }
 func WithName(state *State) cli.Flag {
