@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -9,59 +8,20 @@ import (
 )
 
 func main() {
-	myMap := map[string]string{
-		"aa": "aaa",
-		"bb": "bbb",
-		"cc": "ccc",
-	}
+	state := &State{}
 
 	app := &cli.App{
-
-		Action: func(cCtx *cli.Context) error {
-			fmt.Println(myMap[cCtx.Args().First()])
+		Before: func(cCtx *cli.Context) error {
+			state.Snippets = ReadSnippets()
 			return nil
 		},
+		Action: DefaultAction(state),
 		Commands: []*cli.Command{
-			{
-				Name:  "list",
-				Usage: "list snippets",
-				Action: func(cCtx *cli.Context) error {
-					fmt.Println("list snippets")
-					return nil
-				},
-			},
-			{
-				Name:  "add",
-				Usage: "add snippet",
-				Action: func(cCtx *cli.Context) error {
-					fmt.Println("add snippet")
-					return nil
-				},
-			},
-			{
-				Name:  "edit",
-				Usage: "edit snippet",
-				Action: func(cCtx *cli.Context) error {
-					fmt.Println("edit snippet")
-					return nil
-				},
-			},
-			{
-				Name:  "get",
-				Usage: "get snippet",
-				Action: func(cCtx *cli.Context) error {
-					fmt.Println("get snippet")
-					return nil
-				},
-			},
-			{
-				Name:  "delete",
-				Usage: "delete snippet",
-				Action: func(cCtx *cli.Context) error {
-					fmt.Println("delete snippet")
-					return nil
-				},
-			},
+			AddCommand(state),
+			ListCommand(state),
+			EditCommand(state),
+			GetCommand(state),
+			DeleteCommand(state),
 		},
 	}
 
