@@ -51,6 +51,19 @@ func DeleteCommand(state *State) *cli.Command {
 	}
 }
 
+func EditCommand(state *State) *cli.Command {
+	return &cli.Command{
+		Name:    "edit",
+		Aliases: []string{"e"},
+		Usage:   "edit snippet",
+		After:   saveFunc(state),
+		Action:  EditAction(state),
+		Flags: []cli.Flag{
+			WithName(state),
+		},
+	}
+}
+
 func saveFunc(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
 		WriteSnippets(state.Snippets)

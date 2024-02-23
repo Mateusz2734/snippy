@@ -17,6 +17,7 @@ func NewApp(state *State) *cli.App {
 			GetCommand(state),
 			ListCommand(state),
 			DeleteCommand(state),
+			EditCommand(state),
 		},
 	}
 }
