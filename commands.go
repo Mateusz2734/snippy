@@ -14,6 +14,7 @@ func AddCommand(state *State) *cli.Command {
 		Flags: []cli.Flag{
 			WithInputFile(state),
 			WithName(state),
+			WithLanguage(state),
 		},
 	}
 }
@@ -60,6 +61,7 @@ func EditCommand(state *State) *cli.Command {
 		Action:  EditAction(state),
 		Flags: []cli.Flag{
 			WithName(state),
+			WithLanguage(state),
 		},
 	}
 }

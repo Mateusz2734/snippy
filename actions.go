@@ -95,7 +95,14 @@ func AddAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		state.Snippets[state.Name] = &Snippet{Content: string(content), CreatedAt: time.Now().Unix(), UpdatedAt: time.Now().Unix()}
+		snippet := &Snippet{Content: string(content), CreatedAt: time.Now().Unix(), UpdatedAt: time.Now().Unix()}
+
+		if state.Language != "" {
+			snippet.Language = state.Language
+		}
+
+		state.Snippets[state.Name] = snippet
+
 		cCtx.App.Writer.Write([]byte("Snippet added successfully\n"))
 		return nil
 	}
@@ -134,6 +141,12 @@ func EditAction(state *State) func(cCtx *cli.Context) error {
 
 		if snippet, ok = snippets[state.Name]; !ok {
 			cCtx.App.ErrWriter.Write([]byte("Snippet not found\n"))
+		}
+
+		if state.Language != "" {
+			snippet.Language = state.Language
+			cCtx.App.Writer.Write([]byte("Snippet updated successfully\n"))
+			return nil
 		}
 
 		if snippet.Language != "" {

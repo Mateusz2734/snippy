@@ -10,11 +10,21 @@ func WithInputFile(state *State) cli.Flag {
 		Destination: &state.InputFile,
 	}
 }
+
 func WithName(state *State) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "name",
 		Usage:       "Set the name of the snippet.",
 		Aliases:     []string{"n"},
 		Destination: &state.Name,
+	}
+}
+
+func WithLanguage(state *State) cli.Flag {
+	return &cli.StringFlag{
+		Name:        "language",
+		Usage:       "Set the language of the snippet.",
+		Aliases:     []string{"l", "lang"},
+		Destination: &state.Language,
 	}
 }
