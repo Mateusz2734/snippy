@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"time"
 
 	"github.com/urfave/cli/v2"
 	"golang.design/x/clipboard"
@@ -17,8 +18,8 @@ func DefaultAction(state *State) func(cCtx *cli.Context) error {
 
 		snippet := state.Snippets[cCtx.Args().First()]
 
-		if snippet != "" {
-			clipboard.Write(clipboard.FmtText, []byte(snippet))
+		if snippet.Content != "" {
+			clipboard.Write(clipboard.FmtText, []byte(snippet.Content))
 			cCtx.App.Writer.Write([]byte("Copied!\n"))
 		}
 
@@ -34,7 +35,18 @@ func GetAction(state *State) func(cCtx *cli.Context) error {
 		}
 
 		if snippet, ok := state.Snippets[state.Name]; ok {
-			cCtx.App.Writer.Write([]byte(snippet))
+			cCtx.App.Writer.Write([]byte("Metadata = { "))
+			if snippet.CreatedAt != 0 {
+				cCtx.App.Writer.Write([]byte(fmt.Sprintf("Created: %d ", snippet.CreatedAt)))
+			}
+			if snippet.UpdatedAt != 0 {
+				cCtx.App.Writer.Write([]byte(fmt.Sprintf("Updated: %d ", snippet.UpdatedAt)))
+			}
+			if snippet.Language != "" {
+				cCtx.App.Writer.Write([]byte(fmt.Sprintf("Language: %s ", snippet.Language)))
+			}
+			cCtx.App.Writer.Write([]byte("}\n\n"))
+			cCtx.App.Writer.Write([]byte(snippet.Content))
 			return nil
 		}
 
@@ -45,6 +57,11 @@ func GetAction(state *State) func(cCtx *cli.Context) error {
 
 func ListAction(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
+		if len(state.Snippets) == 0 {
+			cCtx.App.Writer.Write([]byte("No snippets found\n"))
+			return nil
+		}
+
 		for name := range state.Snippets {
 			cCtx.App.Writer.Write([]byte(name + "\n"))
 		}
@@ -78,7 +95,7 @@ func AddAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		state.Snippets[state.Name] = string(content)
+		state.Snippets[state.Name] = &Snippet{Content: string(content), CreatedAt: time.Now().Unix(), UpdatedAt: time.Now().Unix()}
 		cCtx.App.Writer.Write([]byte("Snippet added successfully\n"))
 		return nil
 	}
@@ -105,25 +122,32 @@ func DeleteAction(state *State) func(cCtx *cli.Context) error {
 func EditAction(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
 		var ok bool
-		var snippet string
+		var snippet *Snippet
+		var extension = "txt"
 
 		if state.Name == "" {
 			cCtx.App.ErrWriter.Write([]byte("Name is required\n"))
 			return cli.Exit("", 1)
 		}
 
-		if snippet, ok = state.Snippets[state.Name]; !ok {
+		snippets := state.Snippets
+
+		if snippet, ok = snippets[state.Name]; !ok {
 			cCtx.App.ErrWriter.Write([]byte("Snippet not found\n"))
 		}
 
-		tmpFile, err := os.CreateTemp("", "snippet-*.txt")
+		if snippet.Language != "" {
+			extension = snippet.Language
+		}
+
+		tmpFile, err := os.CreateTemp("", fmt.Sprintf("snippet-*.%s", extension))
 		if err != nil {
 			cCtx.App.ErrWriter.Write([]byte("Cannot create snippet file\n"))
 			return cli.Exit("", 1)
 		}
 		defer os.Remove(tmpFile.Name())
 
-		if _, err := tmpFile.WriteString(snippet); err != nil {
+		if _, err := tmpFile.WriteString(snippet.Content); err != nil {
 			cCtx.App.ErrWriter.Write([]byte("Cannot write snippet to file\n"))
 			return cli.Exit("", 1)
 		}
@@ -142,7 +166,9 @@ func EditAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		state.Snippets[state.Name] = string(modifiedSnippet)
+		elem := state.Snippets[state.Name]
+		elem.Content = string(modifiedSnippet)
+		elem.UpdatedAt = time.Now().Unix()
 		cCtx.App.Writer.Write([]byte("Snippet updated successfully\n"))
 		return nil
 	}

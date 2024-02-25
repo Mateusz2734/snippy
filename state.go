@@ -1,7 +1,7 @@
 package main
 
 type State struct {
-	Snippets  map[string]string
+	Snippets  map[string]*Snippet
 	InputFile string
 	Name      string
 }

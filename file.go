@@ -8,8 +8,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func ReadSnippets() map[string]string {
-	var snippets map[string]string
+func ReadSnippets() map[string]*Snippet {
+	snippets := make(map[string]*Snippet)
 
 	homeDir, _ := os.UserHomeDir()
 	path := filepath.Join(homeDir, ".snippy")
@@ -24,6 +24,10 @@ func ReadSnippets() map[string]string {
 		cli.Exit("Cannot read snippets", 1)
 	}
 
+	if len(data) == 0 {
+		return snippets
+	}
+
 	err = json.Unmarshal(data, &snippets)
 
 	if err != nil {
@@ -33,7 +37,7 @@ func ReadSnippets() map[string]string {
 	return snippets
 }
 
-func WriteSnippets(data map[string]string) {
+func WriteSnippets(data map[string]*Snippet) {
 	homeDir, _ := os.UserHomeDir()
 	path := filepath.Join(homeDir, ".snippy")
 
