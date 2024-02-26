@@ -17,11 +17,16 @@ func DefaultAction(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
 		clipboard.Init()
 
-		snippet := state.Snippets[cCtx.Args().First()]
+		snippet, ok := state.Snippets[cCtx.Args().First()]
+
+		if !ok {
+			return nil
+		}
 
 		if snippet.Content != "" {
 			clipboard.Write(clipboard.FmtText, []byte(snippet.Content))
 			cCtx.App.Writer.Write([]byte("Copied!\n"))
+			return nil
 		}
 
 		return nil
