@@ -41,17 +41,8 @@ func GetAction(state *State) func(cCtx *cli.Context) error {
 		}
 
 		if snippet, ok := state.Snippets[state.Name]; ok {
-			cCtx.App.Writer.Write([]byte("Metadata = { "))
-			if snippet.CreatedAt != 0 {
-				cCtx.App.Writer.Write([]byte(fmt.Sprintf("Created: %d ", snippet.CreatedAt)))
-			}
-			if snippet.UpdatedAt != 0 {
-				cCtx.App.Writer.Write([]byte(fmt.Sprintf("Updated: %d ", snippet.UpdatedAt)))
-			}
-			if snippet.Language != "" {
-				cCtx.App.Writer.Write([]byte(fmt.Sprintf("Language: %s ", snippet.Language)))
-			}
-			cCtx.App.Writer.Write([]byte("}\n\n"))
+			printMetadata(cCtx, snippet)
+
 			cCtx.App.Writer.Write([]byte(snippet.Content))
 			return nil
 		}
@@ -232,4 +223,18 @@ func existingEditor() string {
 		}
 	}
 	return ""
+}
+
+func printMetadata(cCtx *cli.Context, snippet *Snippet) {
+	cCtx.App.Writer.Write([]byte("Metadata = { "))
+	if snippet.CreatedAt != 0 {
+		cCtx.App.Writer.Write([]byte(fmt.Sprintf("Created: %d ", snippet.CreatedAt)))
+	}
+	if snippet.UpdatedAt != 0 {
+		cCtx.App.Writer.Write([]byte(fmt.Sprintf("Updated: %d ", snippet.UpdatedAt)))
+	}
+	if snippet.Language != "" {
+		cCtx.App.Writer.Write([]byte(fmt.Sprintf("Language: %s ", snippet.Language)))
+	}
+	cCtx.App.Writer.Write([]byte("}\n\n"))
 }
