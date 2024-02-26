@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/andrew-d/go-termutil"
 	"github.com/urfave/cli/v2"
 	"golang.design/x/clipboard"
 )
@@ -76,6 +77,11 @@ func AddAction(state *State) func(cCtx *cli.Context) error {
 
 		if state.Name == "" {
 			cCtx.App.ErrWriter.Write([]byte("Name is required\n"))
+			return cli.Exit("", 1)
+		}
+
+		if termutil.Isatty(os.Stdin.Fd()) && state.InputFile == "" {
+			cCtx.App.ErrWriter.Write([]byte("No content provided\n"))
 			return cli.Exit("", 1)
 		}
 
