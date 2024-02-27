@@ -143,6 +143,7 @@ func EditAction(state *State) func(cCtx *cli.Context) error {
 
 		if snippet, ok = snippets[state.Name]; !ok {
 			cCtx.App.ErrWriter.Write([]byte("Snippet not found\n"))
+			return nil
 		}
 
 		if state.Language != "" {
@@ -185,6 +186,69 @@ func EditAction(state *State) func(cCtx *cli.Context) error {
 		elem.Content = string(modifiedSnippet)
 		elem.UpdatedAt = time.Now().Unix()
 		cCtx.App.Writer.Write([]byte("Snippet updated successfully\n"))
+		return nil
+	}
+}
+
+func FavoriteAddAction(state *State) func(cCtx *cli.Context) error {
+	return func(cCtx *cli.Context) error {
+		name := state.Name
+
+		if name == "" {
+			cCtx.App.ErrWriter.Write([]byte("Name is required\n"))
+			return cli.Exit("", 1)
+		}
+
+		if snippet, ok := state.Snippets[name]; ok {
+			snippet.Favorite = true
+			cCtx.App.Writer.Write([]byte("Favorite added successfully\n"))
+			return nil
+		}
+
+		cCtx.App.ErrWriter.Write([]byte("Snippet not found\n"))
+		return nil
+	}
+}
+
+func FavoriteDeleteAction(state *State) func(cCtx *cli.Context) error {
+	return func(cCtx *cli.Context) error {
+		name := state.Name
+
+		if name == "" {
+			cCtx.App.ErrWriter.Write([]byte("Name is required\n"))
+			return cli.Exit("", 1)
+		}
+
+		if snippet, ok := state.Snippets[name]; ok {
+			snippet.Favorite = false
+			cCtx.App.Writer.Write([]byte("Favorite deleted successfully\n"))
+			return nil
+		}
+
+		cCtx.App.ErrWriter.Write([]byte("Snippet not found\n"))
+		return nil
+	}
+}
+
+func FavoriteListAction(state *State) func(cCtx *cli.Context) error {
+	return func(cCtx *cli.Context) error {
+		filteredSnippets := make([]string, 0, len(state.Snippets))
+
+		for key, snippet := range state.Snippets {
+			if snippet.Favorite {
+				filteredSnippets = append(filteredSnippets, key)
+			}
+		}
+
+		if len(filteredSnippets) == 0 {
+			cCtx.App.Writer.Write([]byte("No favorite snippets found\n"))
+			return nil
+		}
+
+		for _, snippet := range filteredSnippets {
+			cCtx.App.Writer.Write([]byte(snippet + "\n"))
+		}
+
 		return nil
 	}
 }

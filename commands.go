@@ -66,6 +66,39 @@ func EditCommand(state *State) *cli.Command {
 	}
 }
 
+func FavoriteCommand(state *State) *cli.Command {
+	return &cli.Command{
+		Name:            "favorite",
+		Aliases:         []string{"f"},
+		Usage:           "manage favorite snippets",
+		HideHelpCommand: true,
+		Subcommands: []*cli.Command{
+			&cli.Command{
+				Name:    "add",
+				Aliases: []string{"a"},
+				Usage:   "add snippet to favorites",
+				After:   saveFunc(state),
+				Action:  FavoriteAddAction(state),
+				Flags:   []cli.Flag{WithName(state)},
+			},
+			&cli.Command{
+				Name:    "delete",
+				Aliases: []string{"d"},
+				Usage:   "delete snippet from favorites",
+				After:   saveFunc(state),
+				Action:  FavoriteDeleteAction(state),
+				Flags:   []cli.Flag{WithName(state)},
+			},
+			&cli.Command{
+				Name:    "list",
+				Aliases: []string{"l"},
+				Usage:   "list favorites",
+				Action:  FavoriteListAction(state),
+			},
+		},
+	}
+}
+
 func saveFunc(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
 		WriteSnippets(state.Snippets)

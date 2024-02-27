@@ -1,6 +1,8 @@
 package main
 
-import "github.com/urfave/cli/v2"
+import (
+	"github.com/urfave/cli/v2"
+)
 
 func NewApp(state *State) *cli.App {
 	return &cli.App{
@@ -18,6 +20,7 @@ func NewApp(state *State) *cli.App {
 			ListCommand(state),
 			DeleteCommand(state),
 			EditCommand(state),
+			FavoriteCommand(state),
 		},
 	}
 }
