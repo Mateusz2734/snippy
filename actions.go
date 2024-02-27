@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/andrew-d/go-termutil"
@@ -186,6 +187,39 @@ func EditAction(state *State) func(cCtx *cli.Context) error {
 		elem.Content = string(modifiedSnippet)
 		elem.UpdatedAt = time.Now().Unix()
 		cCtx.App.Writer.Write([]byte("Snippet updated successfully\n"))
+		return nil
+	}
+}
+
+func SearchAction(state *State) func(cCtx *cli.Context) error {
+
+	languageMatches := func(snippet *Snippet) bool {
+		return state.Language == "" || snippet.Language == state.Language
+	}
+
+	nameMatches := func(key string) bool {
+		return state.Name == "" || strings.Contains(key, state.Name)
+	}
+
+	return func(cCtx *cli.Context) error {
+
+		filteredSnippets := make([]string, 0, len(state.Snippets))
+
+		for key, snippet := range state.Snippets {
+			if languageMatches(snippet) && nameMatches(key) {
+				filteredSnippets = append(filteredSnippets, key)
+			}
+		}
+
+		if len(filteredSnippets) == 0 {
+			cCtx.App.Writer.Write([]byte("No snippets found\n"))
+			return nil
+		}
+
+		for _, snippet := range filteredSnippets {
+			cCtx.App.Writer.Write([]byte(snippet + "\n"))
+		}
+
 		return nil
 	}
 }

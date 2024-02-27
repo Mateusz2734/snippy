@@ -20,6 +20,7 @@ func NewApp(state *State) *cli.App {
 			ListCommand(state),
 			DeleteCommand(state),
 			EditCommand(state),
+			SearchCommand(state),
 			FavoriteCommand(state),
 		},
 	}

@@ -66,6 +66,19 @@ func EditCommand(state *State) *cli.Command {
 	}
 }
 
+func SearchCommand(state *State) *cli.Command {
+	return &cli.Command{
+		Name:    "search",
+		Aliases: []string{"s"},
+		Usage:   "search snippets",
+		Action:  SearchAction(state),
+		Flags: []cli.Flag{
+			WithLanguage(state),
+			WithName(state),
+		},
+	}
+}
+
 func FavoriteCommand(state *State) *cli.Command {
 	return &cli.Command{
 		Name:            "favorite",
