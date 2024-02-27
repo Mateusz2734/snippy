@@ -20,11 +20,11 @@ func WithName(state *State) cli.Flag {
 	}
 }
 
-func WithLanguage(state *State) cli.Flag {
+func WithExtension(state *State) cli.Flag {
 	return &cli.StringFlag{
-		Name:        "language",
-		Usage:       "Set the language of the snippet.",
-		Aliases:     []string{"l", "lang"},
-		Destination: &state.Language,
+		Name:        "extension",
+		Usage:       "Set the programming language extension of the snippet.",
+		Aliases:     []string{"e", "ext"},
+		Destination: &state.Extension,
 	}
 }

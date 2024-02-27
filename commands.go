@@ -14,7 +14,7 @@ func AddCommand(state *State) *cli.Command {
 		Flags: []cli.Flag{
 			WithInputFile(state),
 			WithName(state),
-			WithLanguage(state),
+			WithExtension(state),
 		},
 	}
 }
@@ -61,7 +61,7 @@ func EditCommand(state *State) *cli.Command {
 		Action:  EditAction(state),
 		Flags: []cli.Flag{
 			WithName(state),
-			WithLanguage(state),
+			WithExtension(state),
 		},
 	}
 }
@@ -73,7 +73,7 @@ func SearchCommand(state *State) *cli.Command {
 		Usage:   "search snippets",
 		Action:  SearchAction(state),
 		Flags: []cli.Flag{
-			WithLanguage(state),
+			WithExtension(state),
 			WithName(state),
 		},
 	}

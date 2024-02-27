@@ -100,8 +100,8 @@ func AddAction(state *State) func(cCtx *cli.Context) error {
 
 		snippet := &Snippet{Content: string(content), CreatedAt: time.Now().Unix(), UpdatedAt: time.Now().Unix()}
 
-		if state.Language != "" {
-			snippet.Language = state.Language
+		if state.Extension != "" {
+			snippet.Extension = state.Extension
 		}
 
 		state.Snippets[state.Name] = snippet
@@ -147,14 +147,14 @@ func EditAction(state *State) func(cCtx *cli.Context) error {
 			return nil
 		}
 
-		if state.Language != "" {
-			snippet.Language = state.Language
+		if state.Extension != "" {
+			snippet.Extension = state.Extension
 			cCtx.App.Writer.Write([]byte("Snippet updated successfully\n"))
 			return nil
 		}
 
-		if snippet.Language != "" {
-			extension = snippet.Language
+		if snippet.Extension != "" {
+			extension = snippet.Extension
 		}
 
 		tmpFile, err := os.CreateTemp("", fmt.Sprintf("snippet-*.%s", extension))
@@ -192,9 +192,8 @@ func EditAction(state *State) func(cCtx *cli.Context) error {
 }
 
 func SearchAction(state *State) func(cCtx *cli.Context) error {
-
-	languageMatches := func(snippet *Snippet) bool {
-		return state.Language == "" || snippet.Language == state.Language
+	extensionMatches := func(snippet *Snippet) bool {
+		return state.Extension == "" || snippet.Extension == state.Extension
 	}
 
 	nameMatches := func(key string) bool {
@@ -202,11 +201,10 @@ func SearchAction(state *State) func(cCtx *cli.Context) error {
 	}
 
 	return func(cCtx *cli.Context) error {
-
 		filteredSnippets := make([]string, 0, len(state.Snippets))
 
 		for key, snippet := range state.Snippets {
-			if languageMatches(snippet) && nameMatches(key) {
+			if extensionMatches(snippet) && nameMatches(key) {
 				filteredSnippets = append(filteredSnippets, key)
 			}
 		}
@@ -331,8 +329,8 @@ func printMetadata(cCtx *cli.Context, snippet *Snippet) {
 	if snippet.UpdatedAt != 0 {
 		cCtx.App.Writer.Write([]byte(fmt.Sprintf("Updated: %d ", snippet.UpdatedAt)))
 	}
-	if snippet.Language != "" {
-		cCtx.App.Writer.Write([]byte(fmt.Sprintf("Language: %s ", snippet.Language)))
+	if snippet.Extension != "" {
+		cCtx.App.Writer.Write([]byte(fmt.Sprintf("Extension: %s ", snippet.Extension)))
 	}
 	cCtx.App.Writer.Write([]byte("}\n\n"))
 }
