@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alecthomas/chroma/quick"
 	"github.com/andrew-d/go-termutil"
 	"github.com/urfave/cli/v2"
 	"golang.design/x/clipboard"
@@ -44,7 +45,7 @@ func GetAction(state *State) func(cCtx *cli.Context) error {
 		if snippet, ok := state.Snippets[state.Name]; ok {
 			printMetadata(cCtx, snippet)
 
-			cCtx.App.Writer.Write([]byte(snippet.Content))
+			quick.Highlight(cCtx.App.Writer, snippet.Content, snippet.Extension, "terminal256", "dracula")
 			return nil
 		}
 

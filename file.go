@@ -41,7 +41,7 @@ func WriteSnippets(data map[string]*Snippet) {
 	homeDir, _ := os.UserHomeDir()
 	path := filepath.Join(homeDir, ".snippy")
 
-	jsonData, err := json.Marshal(data)
+	jsonData, err := json.MarshalIndent(data, "", "\t")
 
 	if err != nil {
 		cli.Exit("Cannot parse snippets", 1)
