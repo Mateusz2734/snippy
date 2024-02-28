@@ -28,3 +28,13 @@ func WithExtension(state *State) cli.Flag {
 		Destination: &state.Extension,
 	}
 }
+
+func WithClipboard(state *State) cli.Flag {
+	return &cli.BoolFlag{
+		Name:        "clipboard",
+		Usage:       "Import content from the clipboard.",
+		Aliases:     []string{"c", "clip"},
+		Destination: &state.UseClipboard,
+		EnvVars:     []string{"SNIPPY_USE_CLIPBOARD"},
+	}
+}

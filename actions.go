@@ -17,7 +17,12 @@ import (
 
 func DefaultAction(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
-		clipboard.Init()
+		err := clipboard.Init()
+
+		if err != nil {
+			cCtx.App.ErrWriter.Write([]byte("Cannot initialize clipboard\n"))
+			return cli.Exit("", 1)
+		}
 
 		snippet, ok := state.Snippets[cCtx.Args().First()]
 
@@ -73,20 +78,22 @@ func AddAction(state *State) func(cCtx *cli.Context) error {
 		var content []byte
 		var err error
 
+		if err = clipboard.Init(); err != nil {
+			cCtx.App.ErrWriter.Write([]byte("Cannot initialize clipboard\n"))
+			return cli.Exit("", 1)
+		}
+
 		if state.Name == "" {
 			cCtx.App.ErrWriter.Write([]byte("Name is required\n"))
 			return cli.Exit("", 1)
 		}
 
-		if termutil.Isatty(os.Stdin.Fd()) && state.InputFile == "" {
-			cCtx.App.ErrWriter.Write([]byte("No content provided\n"))
-			return cli.Exit("", 1)
-		}
-
-		if state.InputFile == "" {
-			content, err = io.ReadAll(os.Stdin)
-		} else {
+		if state.InputFile != "" {
 			content, err = os.ReadFile(state.InputFile)
+		} else if !termutil.Isatty(os.Stdin.Fd()) {
+			content, err = io.ReadAll(os.Stdin)
+		} else if state.UseClipboard {
+			content = clipboard.Read(clipboard.FmtText)
 		}
 
 		if err != nil {
@@ -94,7 +101,7 @@ func AddAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		if len(content) == 0 {
+		if content == nil || len(content) == 0 {
 			cCtx.App.ErrWriter.Write([]byte("Snippet content is required\n"))
 			return cli.Exit("", 1)
 		}
