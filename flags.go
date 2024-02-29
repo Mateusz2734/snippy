@@ -46,6 +46,12 @@ func WithPage(state *State) cli.Flag {
 		Aliases:     []string{"p"},
 		Value:       1,
 		Destination: &state.CurrentPage,
+		Action: func(cCtx *cli.Context, newValue int) error {
+			if newValue < 1 {
+				return cli.Exit("Page number should be greater than 0", 1)
+			}
+			return nil
+		},
 	}
 }
 
