@@ -87,29 +87,41 @@ func FavoriteCommand(state *State) *cli.Command {
 		Usage:           "manage favorite snippets",
 		HideHelpCommand: true,
 		Subcommands: []*cli.Command{
-			&cli.Command{
-				Name:    "add",
-				Aliases: []string{"a"},
-				Usage:   "add snippet to favorites",
-				After:   saveFunc(state),
-				Action:  FavoriteAddAction(state),
-				Flags:   []cli.Flag{WithName(state)},
-			},
-			&cli.Command{
-				Name:    "delete",
-				Aliases: []string{"d"},
-				Usage:   "delete snippet from favorites",
-				After:   saveFunc(state),
-				Action:  FavoriteDeleteAction(state),
-				Flags:   []cli.Flag{WithName(state)},
-			},
-			&cli.Command{
-				Name:    "list",
-				Aliases: []string{"l"},
-				Usage:   "list favorites",
-				Action:  FavoriteListAction(state),
-			},
+			FavoriteAddCommand(state),
+			FavoriteDeleteCommand(state),
+			FavoriteListCommand(state),
 		},
+	}
+}
+
+func FavoriteAddCommand(state *State) *cli.Command {
+	return &cli.Command{
+		Name:    "add",
+		Aliases: []string{"a"},
+		Usage:   "add snippet to favorites",
+		After:   saveFunc(state),
+		Action:  FavoriteAddAction(state),
+		Flags:   []cli.Flag{WithName(state)},
+	}
+}
+
+func FavoriteDeleteCommand(state *State) *cli.Command {
+	return &cli.Command{
+		Name:    "delete",
+		Aliases: []string{"d"},
+		Usage:   "delete snippet from favorites",
+		After:   saveFunc(state),
+		Action:  FavoriteDeleteAction(state),
+		Flags:   []cli.Flag{WithName(state)},
+	}
+}
+
+func FavoriteListCommand(state *State) *cli.Command {
+	return &cli.Command{
+		Name:    "list",
+		Aliases: []string{"l"},
+		Usage:   "list favorites",
+		Action:  FavoriteListAction(state),
 	}
 }
 
