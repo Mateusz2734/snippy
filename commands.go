@@ -26,6 +26,10 @@ func ListCommand(state *State) *cli.Command {
 		Aliases: []string{"l"},
 		Usage:   "list snippets",
 		Action:  ListAction(state),
+		Flags: []cli.Flag{
+			WithPage(state),
+			WithPageSize(state),
+		},
 	}
 }
 
@@ -122,6 +126,10 @@ func FavoriteListCommand(state *State) *cli.Command {
 		Aliases: []string{"l"},
 		Usage:   "list favorites",
 		Action:  FavoriteListAction(state),
+		Flags: []cli.Flag{
+			WithPage(state),
+			WithPageSize(state),
+		},
 	}
 }
 

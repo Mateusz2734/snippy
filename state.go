@@ -6,4 +6,6 @@ type State struct {
 	Name         string
 	Extension    string
 	UseClipboard bool
+	CurrentPage  int
+	PageSize     int
 }

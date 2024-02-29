@@ -38,3 +38,22 @@ func WithClipboard(state *State) cli.Flag {
 		EnvVars:     []string{"SNIPPY_USE_CLIPBOARD"},
 	}
 }
+
+func WithPage(state *State) cli.Flag {
+	return &cli.IntFlag{
+		Name:        "page",
+		Usage:       "Specify current page for the snippet list.",
+		Aliases:     []string{"p"},
+		Value:       1,
+		Destination: &state.CurrentPage,
+	}
+}
+
+func WithPageSize(state *State) cli.Flag {
+	return &cli.IntFlag{
+		Hidden:      true,
+		Value:       20,
+		Destination: &state.PageSize,
+		EnvVars:     []string{"SNIPPY_PAGE_SIZE"},
+	}
+}

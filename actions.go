@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -66,9 +67,19 @@ func ListAction(state *State) func(cCtx *cli.Context) error {
 			return nil
 		}
 
-		for name := range state.Snippets {
-			cCtx.App.Writer.Write([]byte(name + "\n"))
+		sortedSnippets := sortByFavorite(state.Snippets, false)
+
+		iterator := (state.CurrentPage - 1) * state.PageSize
+
+		if iterator >= len(sortedSnippets) {
+			cCtx.App.Writer.Write([]byte("This page is empty\n"))
+			return nil
 		}
+
+		for i := iterator; i < len(sortedSnippets) && i < iterator+state.PageSize; i++ {
+			cCtx.App.Writer.Write([]byte(sortedSnippets[i] + "\n"))
+		}
+
 		return nil
 	}
 }
@@ -272,21 +283,22 @@ func FavoriteDeleteAction(state *State) func(cCtx *cli.Context) error {
 
 func FavoriteListAction(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
-		filteredSnippets := make([]string, 0, len(state.Snippets))
-
-		for key, snippet := range state.Snippets {
-			if snippet.Favorite {
-				filteredSnippets = append(filteredSnippets, key)
-			}
-		}
+		filteredSnippets := sortByFavorite(state.Snippets, true)
 
 		if len(filteredSnippets) == 0 {
 			cCtx.App.Writer.Write([]byte("No favorite snippets found\n"))
 			return nil
 		}
 
-		for _, snippet := range filteredSnippets {
-			cCtx.App.Writer.Write([]byte(snippet + "\n"))
+		iterator := (state.CurrentPage - 1) * state.PageSize
+
+		if iterator >= len(filteredSnippets) {
+			cCtx.App.Writer.Write([]byte("This page is empty\n"))
+			return nil
+		}
+
+		for i := iterator; i < len(filteredSnippets) && i < iterator+state.PageSize; i++ {
+			cCtx.App.Writer.Write([]byte(filteredSnippets[i] + "\n"))
 		}
 
 		return nil
@@ -341,4 +353,22 @@ func printMetadata(cCtx *cli.Context, snippet *Snippet) {
 		cCtx.App.Writer.Write([]byte(fmt.Sprintf("Extension: %s ", snippet.Extension)))
 	}
 	cCtx.App.Writer.Write([]byte("}\n\n"))
+}
+
+func sortByFavorite(snippets map[string]*Snippet, onlyFavorites bool) []string {
+	favorites := make([]string, 0, len(snippets))
+	rest := make([]string, 0, len(snippets))
+
+	for key, snippet := range snippets {
+		if snippet.Favorite {
+			favorites = append(favorites, key)
+		} else if !onlyFavorites {
+			rest = append(rest, key)
+		}
+	}
+
+	slices.Sort(favorites)
+	slices.Sort(rest)
+
+	return slices.Concat(favorites, rest)
 }
