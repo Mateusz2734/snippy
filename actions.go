@@ -49,7 +49,9 @@ func GetAction(state *State) func(cCtx *cli.Context) error {
 		}
 
 		if snippet, ok := state.Snippets[state.Name]; ok {
-			printMetadata(cCtx, snippet)
+			if !state.NoMetadata {
+				printMetadata(cCtx, snippet)
+			}
 
 			quick.Highlight(cCtx.App.Writer, snippet.Content, snippet.Extension, "terminal256", "dracula")
 			return nil

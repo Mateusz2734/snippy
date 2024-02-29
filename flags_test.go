@@ -107,3 +107,53 @@ func TestWithPageSize(t *testing.T) {
 	assert.Equal(t, 30, state.PageSize, "page size should be 30")
 	assert.Empty(t, errBuf.String(), "no error expected")
 }
+
+func TestMetadata(t *testing.T) {
+	state := &State{}
+	buf := new(bytes.Buffer)
+	errBuf := new(bytes.Buffer)
+
+	app := cli.App{
+		Writer:    buf,
+		ErrWriter: errBuf,
+		Flags: []cli.Flag{
+			WithMetadata(state),
+			WithNoMetadata(state),
+		},
+	}
+
+	t.Setenv("SNIPPY_NO_METADATA", "")
+
+	app.Run([]string{"app"})
+	assert.False(t, state.NoMetadata, "default noMetadata value should be false")
+
+	app.Run([]string{"app", "--no-metadata"})
+	assert.True(t, state.NoMetadata, "noMetadata value should be true")
+
+	app.Run([]string{"app", "--metadata"})
+	assert.False(t, state.NoMetadata, "noMetadata value should be false")
+
+	app.Run([]string{"app", "--metadata", "--no-metadata"})
+	assert.False(t, state.NoMetadata, "noMetadata value should be true")
+
+	app.Run([]string{"app", "--no-metadata", "--metadata"})
+	assert.False(t, state.NoMetadata, "noMetadata value should be false")
+
+	t.Setenv("SNIPPY_NO_METADATA", "true")
+
+	app.Run([]string{"app"})
+	assert.True(t, state.NoMetadata, "noMetadata value should be true")
+
+	app.Run([]string{"app", "--metadata"})
+	assert.False(t, state.NoMetadata, "noMetadata value should be false")
+
+	t.Setenv("SNIPPY_NO_METADATA", "false")
+
+	app.Run([]string{"app"})
+	assert.False(t, state.NoMetadata, "noMetadata value should be false")
+
+	t.Setenv("SNIPPY_NO_METADATA", "invalid")
+
+	err := app.Run([]string{"app"})
+	assert.NotNil(t, err, "error expected")
+}

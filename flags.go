@@ -63,3 +63,28 @@ func WithPageSize(state *State) cli.Flag {
 		EnvVars:     []string{"SNIPPY_PAGE_SIZE"},
 	}
 }
+
+func WithNoMetadata(state *State) cli.Flag {
+	return &cli.BoolFlag{
+		Name:        "no-metadata",
+		Usage:       "Do not print metadata about the snippet.",
+		Destination: &state.NoMetadata,
+		EnvVars:     []string{"SNIPPY_NO_METADATA"},
+		Action: func(cCtx *cli.Context, val bool) error {
+			state.NoMetadata = val
+			return nil
+		},
+	}
+}
+
+func WithMetadata(state *State) cli.Flag {
+	return &cli.BoolFlag{
+		Name:        "metadata",
+		Usage:       "Print metadata about the snippet.",
+		Destination: &state.NoMetadata,
+		Action: func(cCtx *cli.Context, val bool) error {
+			state.NoMetadata = !val
+			return nil
+		},
+	}
+}

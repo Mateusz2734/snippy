@@ -40,6 +40,8 @@ func GetCommand(state *State) *cli.Command {
 		Action: GetAction(state),
 		Flags: []cli.Flag{
 			WithName(state),
+			WithMetadata(state),
+			WithNoMetadata(state),
 		},
 	}
 }

@@ -8,4 +8,5 @@ type State struct {
 	UseClipboard bool
 	CurrentPage  int
 	PageSize     int
+	NoMetadata   bool
 }
