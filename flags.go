@@ -88,3 +88,12 @@ func WithMetadata(state *State) cli.Flag {
 		},
 	}
 }
+
+func WithGlobal(state *State) cli.Flag {
+	return &cli.BoolFlag{
+		Name:        "global",
+		Usage:       "Use global snippets by default.",
+		Aliases:     []string{"g"},
+		Destination: &state.UseGlobal,
+	}
+}

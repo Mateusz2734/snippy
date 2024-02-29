@@ -8,11 +8,77 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func ReadSnippets() map[string]*Snippet {
-	snippets := make(map[string]*Snippet)
+func ReadSnippets() (map[string]*Snippet, map[string]*Snippet) {
+	var globalSnippets = make(map[string]*Snippet)
 
 	homeDir, _ := os.UserHomeDir()
 	path := filepath.Join(homeDir, ".snippy")
+
+	globalSnippets = readSnippetsFromFile(path)
+
+	localExists, localPath := localSnippyExists()
+	if localExists {
+		localSnippets := readSnippetsFromFile(localPath)
+		return globalSnippets, localSnippets
+	}
+
+	return globalSnippets, nil
+}
+
+func WriteSnippets(data map[string]*Snippet, global bool) {
+	path := ""
+
+	if global {
+		homeDir, _ := os.UserHomeDir()
+		path = filepath.Join(homeDir, ".snippy")
+	} else {
+		localExists, localPath := localSnippyExists()
+		if localExists {
+			path = localPath
+		} else {
+			cli.Exit("Local snippy not found", 1)
+		}
+	}
+
+	writeSnippetsToFile(data, path)
+}
+
+func writeSnippetsToFile(data map[string]*Snippet, path string) {
+	jsonData, err := json.MarshalIndent(data, "", "\t")
+
+	if err != nil {
+		cli.Exit("Cannot parse snippets", 1)
+	}
+
+	err = os.WriteFile(path, jsonData, 0644)
+
+	if err != nil {
+		cli.Exit("Cannot write snippets", 1)
+	}
+}
+
+func localSnippyExists() (bool, string) {
+	path, _ := os.Getwd()
+	homeDir, _ := os.UserHomeDir()
+
+	for path != filepath.Dir(path) {
+		if path == homeDir {
+			return false, ""
+		}
+
+		snippyPath := filepath.Join(path, ".snippy")
+		if stat, err := os.Stat(snippyPath); err == nil && !stat.IsDir() {
+			return true, snippyPath
+		}
+
+		path = filepath.Dir(path)
+	}
+
+	return false, ""
+}
+
+func readSnippetsFromFile(path string) map[string]*Snippet {
+	snippets := make(map[string]*Snippet)
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.Create(path)
@@ -35,21 +101,4 @@ func ReadSnippets() map[string]*Snippet {
 	}
 
 	return snippets
-}
-
-func WriteSnippets(data map[string]*Snippet) {
-	homeDir, _ := os.UserHomeDir()
-	path := filepath.Join(homeDir, ".snippy")
-
-	jsonData, err := json.MarshalIndent(data, "", "\t")
-
-	if err != nil {
-		cli.Exit("Cannot parse snippets", 1)
-	}
-
-	err = os.WriteFile(path, jsonData, 0644)
-
-	if err != nil {
-		cli.Exit("Cannot write snippets", 1)
-	}
 }

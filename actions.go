@@ -25,7 +25,7 @@ func DefaultAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		snippet, ok := state.Snippets[cCtx.Args().First()]
+		snippet, ok := state.GetSnippets()[cCtx.Args().First()]
 
 		if !ok {
 			return nil
@@ -48,7 +48,7 @@ func GetAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		if snippet, ok := state.Snippets[state.Name]; ok {
+		if snippet, ok := state.GetSnippets()[state.Name]; ok {
 			if !state.NoMetadata {
 				printMetadata(cCtx, snippet)
 			}
@@ -64,12 +64,12 @@ func GetAction(state *State) func(cCtx *cli.Context) error {
 
 func ListAction(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
-		if len(state.Snippets) == 0 {
+		if len(state.GetSnippets()) == 0 {
 			cCtx.App.Writer.Write([]byte("No snippets found\n"))
 			return nil
 		}
 
-		sortedSnippets := sortByFavorite(state.Snippets, false)
+		sortedSnippets := sortByFavorite(state.GetSnippets(), false)
 
 		iterator := (state.CurrentPage - 1) * state.PageSize
 
@@ -125,7 +125,8 @@ func AddAction(state *State) func(cCtx *cli.Context) error {
 			snippet.Extension = state.Extension
 		}
 
-		state.Snippets[state.Name] = snippet
+		snippets := state.GetSnippets()
+		snippets[state.Name] = snippet
 
 		cCtx.App.Writer.Write([]byte("Snippet added successfully\n"))
 		return nil
@@ -139,8 +140,10 @@ func DeleteAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		if _, ok := state.Snippets[state.Name]; ok {
-			delete(state.Snippets, state.Name)
+		snippets := state.GetSnippets()
+
+		if _, ok := snippets[state.Name]; ok {
+			delete(snippets, state.Name)
 			cCtx.App.Writer.Write([]byte("Snippet deleted successfully\n"))
 			return nil
 		}
@@ -161,9 +164,7 @@ func EditAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		snippets := state.Snippets
-
-		if snippet, ok = snippets[state.Name]; !ok {
+		if snippet, ok = state.GetSnippets()[state.Name]; !ok {
 			cCtx.App.ErrWriter.Write([]byte("Snippet not found\n"))
 			return nil
 		}
@@ -204,9 +205,10 @@ func EditAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		elem := state.Snippets[state.Name]
+		elem := state.GetSnippets()[state.Name]
 		elem.Content = string(modifiedSnippet)
 		elem.UpdatedAt = time.Now().Unix()
+
 		cCtx.App.Writer.Write([]byte("Snippet updated successfully\n"))
 		return nil
 	}
@@ -222,9 +224,9 @@ func SearchAction(state *State) func(cCtx *cli.Context) error {
 	}
 
 	return func(cCtx *cli.Context) error {
-		filteredSnippets := make([]string, 0, len(state.Snippets))
+		filteredSnippets := make([]string, 0, len(state.GetSnippets()))
 
-		for key, snippet := range state.Snippets {
+		for key, snippet := range state.GetSnippets() {
 			if extensionMatches(snippet) && nameMatches(key) {
 				filteredSnippets = append(filteredSnippets, key)
 			}
@@ -252,7 +254,7 @@ func FavoriteAddAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		if snippet, ok := state.Snippets[name]; ok {
+		if snippet, ok := state.GetSnippets()[name]; ok {
 			snippet.Favorite = true
 			cCtx.App.Writer.Write([]byte("Favorite added successfully\n"))
 			return nil
@@ -272,7 +274,7 @@ func FavoriteDeleteAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		if snippet, ok := state.Snippets[name]; ok {
+		if snippet, ok := state.GetSnippets()[name]; ok {
 			snippet.Favorite = false
 			cCtx.App.Writer.Write([]byte("Favorite deleted successfully\n"))
 			return nil
@@ -285,7 +287,7 @@ func FavoriteDeleteAction(state *State) func(cCtx *cli.Context) error {
 
 func FavoriteListAction(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
-		filteredSnippets := sortByFavorite(state.Snippets, true)
+		filteredSnippets := sortByFavorite(state.GetSnippets(), true)
 
 		if len(filteredSnippets) == 0 {
 			cCtx.App.Writer.Write([]byte("No favorite snippets found\n"))
