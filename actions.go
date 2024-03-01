@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"strings"
@@ -303,6 +304,35 @@ func FavoriteListAction(state *State) func(cCtx *cli.Context) error {
 
 		for i := iterator; i < len(filteredSnippets) && i < iterator+state.PageSize; i++ {
 			cCtx.App.Writer.Write([]byte(filteredSnippets[i] + "\n"))
+		}
+
+		return nil
+	}
+}
+
+func InitAction(state *State) func(cCtx *cli.Context) error {
+	return func(cCtx *cli.Context) error {
+		wd, err := os.Getwd()
+
+		if err != nil {
+			cCtx.App.ErrWriter.Write([]byte("Cannot get working directory\n"))
+			return cli.Exit("", 1)
+		}
+
+		snippyPath := filepath.Join(wd, ".snippy")
+
+		stat, err := os.Stat(snippyPath)
+
+		if err == nil && !stat.IsDir() {
+			cCtx.App.ErrWriter.Write([]byte("Snippy already initialized in this directory\n"))
+			return cli.Exit("", 1)
+		}
+
+		_, err = os.Create(snippyPath)
+
+		if err != nil {
+			cCtx.App.ErrWriter.Write([]byte("Cannot create snippy file\n"))
+			return cli.Exit("", 1)
 		}
 
 		return nil

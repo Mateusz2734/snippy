@@ -135,6 +135,14 @@ func FavoriteListCommand(state *State) *cli.Command {
 	}
 }
 
+func InitCommand(state *State) *cli.Command {
+	return &cli.Command{
+		Name:   "init",
+		Usage:  "initialize snippy",
+		Action: InitAction(state),
+	}
+}
+
 func saveFunc(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
 		WriteSnippets(state.GetSnippets(), state.UseGlobal)
