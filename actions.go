@@ -54,6 +54,11 @@ func GetAction(state *State) func(cCtx *cli.Context) error {
 				printMetadata(cCtx, snippet)
 			}
 
+			if state.NoFormatting {
+				cCtx.App.Writer.Write([]byte(snippet.Content))
+				return nil
+			}
+
 			quick.Highlight(cCtx.App.Writer, snippet.Content, snippet.Extension, "terminal256", "dracula")
 			return nil
 		}

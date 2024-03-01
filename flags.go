@@ -92,8 +92,18 @@ func WithMetadata(state *State) cli.Flag {
 func WithGlobal(state *State) cli.Flag {
 	return &cli.BoolFlag{
 		Name:        "global",
-		Usage:       "Use global snippets by default.",
+		Usage:       "Use global snippets.",
 		Aliases:     []string{"g"},
 		Destination: &state.UseGlobal,
+	}
+}
+
+func WithNoFormatting(state *State) cli.Flag {
+	return &cli.BoolFlag{
+		Name:        "no-formatting",
+		Usage:       "Do not format the snippet content.",
+		Aliases:     []string{"nf"},
+		Destination: &state.NoFormatting,
+		EnvVars:     []string{"SNIPPY_NO_FORMATTING"},
 	}
 }

@@ -10,7 +10,7 @@ import (
 func main() {
 	state := NewState()
 
-	app := NewApp(state, []cli.Flag{WithGlobal(state)})
+	app := NewApp(state, []cli.Flag{WithGlobal(state), WithNoFormatting(state)})
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)

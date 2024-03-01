@@ -4,7 +4,6 @@ type State struct {
 	// Snippet data
 	localSnippets  map[string]*Snippet
 	globalSnippets map[string]*Snippet
-	// GetSnippets    func() map[string]*Snippet
 
 	// Flag data
 	InputFile    string
@@ -15,6 +14,7 @@ type State struct {
 	PageSize     int
 	NoMetadata   bool
 	UseGlobal    bool
+	NoFormatting bool
 }
 
 func (state *State) GetSnippets() map[string]*Snippet {
