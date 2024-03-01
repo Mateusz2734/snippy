@@ -115,7 +115,7 @@ func AddAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		if content == nil || len(content) == 0 {
+		if len(content) == 0 {
 			cCtx.App.ErrWriter.Write([]byte("Snippet content is required\n"))
 			return cli.Exit("", 1)
 		}
