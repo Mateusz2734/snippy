@@ -47,7 +47,7 @@ func TestWithClipboard(t *testing.T) {
 
 	t.Setenv("SNIPPY_USE_CLIPBOARD", "false")
 
-	err = app.Run([]string{"app", "--clipboard"})
+	app.Run([]string{"app", "--clipboard"})
 	assert.True(t, state.UseClipboard, "clipboard value should be true")
 }
 
