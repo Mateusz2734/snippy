@@ -340,6 +340,7 @@ func InitAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
+		cCtx.App.Writer.Write([]byte("Snippy initialized successfully\n"))
 		return nil
 	}
 }
