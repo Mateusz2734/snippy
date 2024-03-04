@@ -333,12 +333,14 @@ func InitAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
-		_, err = os.Create(snippyPath)
+		file, err := os.Create(snippyPath)
 
 		if err != nil {
 			cCtx.App.ErrWriter.Write([]byte("Cannot create snippy file\n"))
 			return cli.Exit("", 1)
 		}
+
+		defer file.Close()
 
 		cCtx.App.Writer.Write([]byte("Snippy initialized successfully\n"))
 		return nil
