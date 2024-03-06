@@ -153,6 +153,81 @@ func TestListCommand(t *testing.T) {
 	assert.Empty(t, stderr.String(), "stderr should be empty")
 }
 
+func TestAddCommand(t *testing.T) {
+	state, app, stdout, stderr := setupTestApp()
+
+	err := app.Run([]string{"snippy", "add", "-h"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "snippy add", "stdout should contain help message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "add"})
+	assert.NotNil(t, err, "error should not be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Name is required", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "add", "--name", "test"})
+	assert.NotNil(t, err, "error should not be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Snippet content is required", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "add", "-n", "test", "--e", "go", "--content", "test content"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "Snippet added successfully", "stdout should contain success message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	snippet := state.localSnippets["test"]
+
+	assert.Equal(t, "test content", snippet.Content, "snippet content should be set")
+	assert.Equal(t, "go", snippet.Extension, "snippet extension should be set")
+	assert.NotZero(t, snippet.CreatedAt, "snippet CreatedAt should be set")
+	assert.NotZero(t, snippet.UpdatedAt, "snippet UpdatedAt should be set")
+}
+
+func TestDeleteCommand(t *testing.T) {
+	state, app, stdout, stderr := setupTestApp()
+
+	err := app.Run([]string{"snippy", "delete", "-h"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "snippy delete", "stdout should contain help message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "delete"})
+	assert.NotNil(t, err, "error should not be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Name is required", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	state.localSnippets["test"] = &Snippet{Content: "test content"}
+
+	err = app.Run([]string{"snippy", "delete", "-n", "test"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "Snippet deleted successfully", "stdout should contain success message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "delete", "--name", "test"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Snippet not found", "stderr should contain error message")
+}
+
 func TestEditCommand(t *testing.T) {
 	state, app, stdout, stderr := setupTestApp()
 
