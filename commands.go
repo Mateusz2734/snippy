@@ -16,6 +16,7 @@ func AddCommand(state *State) *cli.Command {
 			WithName(state),
 			WithExtension(state),
 			WithClipboard(state),
+			WithContent(state),
 		},
 	}
 }

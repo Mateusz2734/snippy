@@ -107,12 +107,16 @@ func AddAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
+		if !termutil.Isatty(os.Stdin.Fd()) {
+			content, err = io.ReadAll(os.Stdin)
+		}
+
 		if state.InputFile != "" {
 			content, err = os.ReadFile(state.InputFile)
-		} else if !termutil.Isatty(os.Stdin.Fd()) {
-			content, err = io.ReadAll(os.Stdin)
 		} else if state.UseClipboard {
 			content = clipboard.Read(clipboard.FmtText)
+		} else if state.Content != "" {
+			content = []byte(state.Content)
 		}
 
 		if err != nil {

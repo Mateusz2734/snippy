@@ -9,6 +9,7 @@ type State struct {
 	InputFile    string
 	Name         string
 	Extension    string
+	Content      string
 	UseClipboard bool
 	CurrentPage  int
 	PageSize     int

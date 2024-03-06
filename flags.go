@@ -107,3 +107,11 @@ func WithNoFormatting(state *State) cli.Flag {
 		EnvVars:     []string{"SNIPPY_NO_FORMATTING"},
 	}
 }
+
+func WithContent(state *State) cli.Flag {
+	return &cli.StringFlag{
+		Name:        "content",
+		Usage:       "Set the content of the snippet.",
+		Destination: &state.Content,
+	}
+}
