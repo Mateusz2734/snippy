@@ -37,6 +37,79 @@ func setupTestApp() (*State, *cli.App, *bytes.Buffer, *bytes.Buffer) {
 	return state, app, stdout, stderr
 }
 
+func TestDefaultAction(t *testing.T) {
+	state, app, stdout, stderr := setupTestApp()
+
+	err := app.Run([]string{"snippy"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "test"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	state.localSnippets["test"] = &Snippet{Content: "test content"}
+
+	err = app.Run([]string{"snippy", "test"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "Copied!", "stdout should contain success message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+}
+
+func TestGetCommand(t *testing.T) {
+	state, app, stdout, stderr := setupTestApp()
+
+	err := app.Run([]string{"snippy", "get", "-h"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "snippy get", "stdout should contain help message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "get"})
+	assert.NotNil(t, err, "error should not be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Name is required", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "get", "--name", "test"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Snippet not found", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	state.localSnippets["test"] = &Snippet{Content: "test content", Extension: "go"}
+
+	err = app.Run([]string{"snippy", "get", "-n", "test", "--nf"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "Metadata", "stdout should contain snippet metadata")
+	assert.Contains(t, stdout.String(), "Extension: go", "stdout should contain snippet extension")
+	assert.Contains(t, stdout.String(), "test content", "stdout should contain snippet content")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "get", "-n", "test", "--no-metadata", "--nf"})
+	assert.Nil(t, err, "error should be nil")
+	assert.NotContains(t, stdout.String(), "Metadata", "stdout should not contain snippet metadata")
+	assert.Contains(t, stdout.String(), "test content", "stdout should contain snippet content")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+}
+
 func TestListCommand(t *testing.T) {
 	state, app, stdout, stderr := setupTestApp()
 
@@ -77,6 +150,87 @@ func TestListCommand(t *testing.T) {
 	err = app.Run([]string{"snippy", "list", "-p", "4"})
 	assert.Nil(t, err, "error should be nil")
 	assert.Contains(t, stdout.String(), "This page is empty", "stdout should be empty")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+}
+
+func TestEditCommand(t *testing.T) {
+	state, app, stdout, stderr := setupTestApp()
+
+	err := app.Run([]string{"snippy", "edit", "-h"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "snippy edit", "stdout should contain help message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "edit"})
+	assert.NotNil(t, err, "error should not be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Name is required", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "edit", "--name", "test"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Snippet not found", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	state.localSnippets["test"] = &Snippet{Content: "test content"}
+
+	err = app.Run([]string{"snippy", "edit", "-n", "test", "--ext", "go"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "Snippet updated successfully", "stdout should contain snippet content")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+	assert.Equal(t, "go", state.localSnippets["test"].Extension, "snippet extension should be updated")
+}
+
+func TestSearchCommand(t *testing.T) {
+	state, app, stdout, stderr := setupTestApp()
+
+	err := app.Run([]string{"snippy", "search", "-h"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "snippy search", "stdout should contain help message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "search", "--name", "test"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "No snippets found", "stdout should be empty")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	state.localSnippets["test"] = &Snippet{Content: "test content"}
+	state.localSnippets["test1"] = &Snippet{Content: "test content", Extension: "go"}
+
+	err = app.Run([]string{"snippy", "search", "-n", "test"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "test", "stdout should contain snippet name")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "search", "--ext", "go"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "test1", "stdout should contain snippet name")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "search"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "test", "stdout should contain name of first snippet")
+	assert.Contains(t, stdout.String(), "test1", "stdout should contain name of second snippet")
 	assert.Empty(t, stderr.String(), "stderr should be empty")
 }
 
