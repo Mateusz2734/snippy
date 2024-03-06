@@ -191,6 +191,23 @@ func TestAddCommand(t *testing.T) {
 	assert.Equal(t, "go", snippet.Extension, "snippet extension should be set")
 	assert.NotZero(t, snippet.CreatedAt, "snippet CreatedAt should be set")
 	assert.NotZero(t, snippet.UpdatedAt, "snippet UpdatedAt should be set")
+
+	stdout.Reset()
+	stderr.Reset()
+	delete(state.localSnippets, "test")
+
+	err = app.Run([]string{"snippy", "add", "-n", "test", "--content", "test content", "--global"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "Snippet added successfully", "stdout should contain success message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	snippet = state.globalSnippets["test"]
+	_, ok := state.localSnippets["test"]
+
+	assert.False(t, ok, "local snippet should not exist")
+	assert.Equal(t, "test content", snippet.Content, "snippet content should be set")
+	assert.NotZero(t, snippet.CreatedAt, "snippet CreatedAt should be set")
+	assert.NotZero(t, snippet.UpdatedAt, "snippet UpdatedAt should be set")
 }
 
 func TestDeleteCommand(t *testing.T) {
