@@ -9,7 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func setupTestApp() (*State, *cli.App, *bytes.Buffer, *bytes.Buffer) {
+func SetupTestApp() (*State, *cli.App, *bytes.Buffer, *bytes.Buffer) {
 	global := make(map[string]*Snippet)
 	local := make(map[string]*Snippet)
 
@@ -38,7 +38,7 @@ func setupTestApp() (*State, *cli.App, *bytes.Buffer, *bytes.Buffer) {
 }
 
 func TestDefaultAction(t *testing.T) {
-	state, app, stdout, stderr := setupTestApp()
+	state, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy"})
 	assert.Nil(t, err, "error should be nil")
@@ -65,7 +65,7 @@ func TestDefaultAction(t *testing.T) {
 }
 
 func TestGetCommand(t *testing.T) {
-	state, app, stdout, stderr := setupTestApp()
+	state, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy", "get", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -111,7 +111,7 @@ func TestGetCommand(t *testing.T) {
 }
 
 func TestListCommand(t *testing.T) {
-	state, app, stdout, stderr := setupTestApp()
+	state, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy", "list", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -154,7 +154,7 @@ func TestListCommand(t *testing.T) {
 }
 
 func TestAddCommand(t *testing.T) {
-	state, app, stdout, stderr := setupTestApp()
+	state, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy", "add", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -211,7 +211,7 @@ func TestAddCommand(t *testing.T) {
 }
 
 func TestDeleteCommand(t *testing.T) {
-	state, app, stdout, stderr := setupTestApp()
+	state, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy", "delete", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -246,7 +246,7 @@ func TestDeleteCommand(t *testing.T) {
 }
 
 func TestEditCommand(t *testing.T) {
-	state, app, stdout, stderr := setupTestApp()
+	state, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy", "edit", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -282,7 +282,7 @@ func TestEditCommand(t *testing.T) {
 }
 
 func TestSearchCommand(t *testing.T) {
-	state, app, stdout, stderr := setupTestApp()
+	state, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy", "search", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -327,7 +327,7 @@ func TestSearchCommand(t *testing.T) {
 }
 
 func TestFavoriteCommand(t *testing.T) {
-	_, app, stdout, stderr := setupTestApp()
+	_, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy", "favorite", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -369,7 +369,7 @@ func TestFavoriteCommand(t *testing.T) {
 }
 
 func TestFavoriteListCommand(t *testing.T) {
-	state, app, stdout, stderr := setupTestApp()
+	state, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy", "favorite", "list", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -414,7 +414,7 @@ func TestFavoriteListCommand(t *testing.T) {
 }
 
 func TestFavoriteAddCommand(t *testing.T) {
-	state, app, stdout, stderr := setupTestApp()
+	state, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy", "favorite", "add", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -459,7 +459,7 @@ func TestFavoriteAddCommand(t *testing.T) {
 }
 
 func TestFavoriteDeleteCommand(t *testing.T) {
-	state, app, stdout, stderr := setupTestApp()
+	state, app, stdout, stderr := SetupTestApp()
 
 	err := app.Run([]string{"snippy", "favorite", "delete", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -513,10 +513,11 @@ func TestFavoriteDeleteCommand(t *testing.T) {
 
 func TestInitCommand(t *testing.T) {
 	initialDir, _ := os.Getwd()
-	_, app, stdout, stderr := setupTestApp()
+	_, app, stdout, stderr := SetupTestApp()
 
 	dir := t.TempDir()
 	os.Chdir(dir)
+	defer os.Chdir(initialDir)
 
 	err := app.Run([]string{"snippy", "init", "-h"})
 	assert.Nil(t, err, "error should be nil")
@@ -539,5 +540,4 @@ func TestInitCommand(t *testing.T) {
 	assert.Empty(t, stdout.String(), "stdout should be empty")
 	assert.Contains(t, stderr.String(), "Snippy already initialized", "stderr should contain error message")
 
-	os.Chdir(initialDir)
 }
