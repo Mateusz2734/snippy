@@ -19,10 +19,10 @@ type State struct {
 }
 
 func (state *State) GetSnippets() map[string]*Snippet {
-	if !state.UseGlobal && state.localSnippets != nil {
-		return state.localSnippets
+	if state.UseGlobal || state.localSnippets == nil {
+		return state.globalSnippets
 	}
-	return state.globalSnippets
+	return state.localSnippets
 }
 
 func (state *State) InitializeSnippets(globalSnippets map[string]*Snippet, localSnippets map[string]*Snippet) {
