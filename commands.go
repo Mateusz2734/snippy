@@ -176,6 +176,7 @@ func BackupRestoreCommand(state *State) *cli.Command {
 		Aliases: []string{"r"},
 		Usage:   "restore snippets from backup file",
 		Action:  BackupRestoreAction(state),
+		After:   saveFunc(state),
 		Flags: []cli.Flag{
 			WithClipboard(state),
 			WithInputFile(state),

@@ -26,6 +26,14 @@ func (state *State) GetSnippets() map[string]*Snippet {
 	return state.localSnippets
 }
 
+func (state *State) SetSnippets(snippets map[string]*Snippet) {
+	if state.UseGlobal || state.localSnippets == nil {
+		state.globalSnippets = snippets
+	} else {
+		state.localSnippets = snippets
+	}
+}
+
 func (state *State) InitializeSnippets(globalSnippets map[string]*Snippet, localSnippets map[string]*Snippet) {
 	state.globalSnippets = globalSnippets
 	state.localSnippets = localSnippets

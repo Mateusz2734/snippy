@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -352,11 +353,58 @@ func InitAction(state *State) func(cCtx *cli.Context) error {
 }
 
 func BackupCreateAction(state *State) func(cCtx *cli.Context) error {
-	return nil
+	return func(cCtx *cli.Context) error {
+		directory := state.Directory
+
+		if directory == "" {
+			directory, _ = os.Getwd()
+		}
+
+		if err := CreateBackupFile(state.GetSnippets(), directory); err != nil {
+			cCtx.App.ErrWriter.Write([]byte(err.Error() + "\n"))
+			return cli.Exit("", 1)
+		}
+
+		cCtx.App.Writer.Write([]byte("Backup created successfully\n"))
+		return nil
+	}
 }
 
 func BackupRestoreAction(state *State) func(cCtx *cli.Context) error {
-	return nil
+	return func(cCtx *cli.Context) error {
+		inputFile := state.InputFile
+
+		if inputFile == "" {
+			cCtx.App.ErrWriter.Write([]byte("Input file is required\n"))
+			return cli.Exit("", 1)
+		}
+
+		data, err := os.ReadFile(inputFile)
+
+		if err != nil {
+			cCtx.App.ErrWriter.Write([]byte("Cannot read input file\n"))
+			return cli.Exit("", 1)
+		}
+
+		if len(data) == 0 {
+			cCtx.App.ErrWriter.Write([]byte("Input file is empty\n"))
+			return cli.Exit("", 1)
+		}
+
+		newSnippets := make(map[string]*Snippet)
+
+		err = json.Unmarshal(data, &newSnippets)
+
+		if err != nil {
+			cCtx.App.ErrWriter.Write([]byte("Cannot parse input file\n"))
+			return cli.Exit("", 1)
+		}
+
+		state.SetSnippets(newSnippets)
+
+		cCtx.App.Writer.Write([]byte("Snippets restored successfully\n"))
+		return nil
+	}
 }
 
 func launchTextEditor(filepath string) error {
