@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/urfave/cli/v2"
 )
@@ -41,6 +43,36 @@ func WriteSnippets(data map[string]*Snippet, global bool) {
 	}
 
 	writeSnippetsToFile(data, path)
+}
+
+func CreateBackupFile(data map[string]*Snippet, dir string) error {
+	jsonData, err := json.Marshal(data)
+
+	if err != nil {
+		return fmt.Errorf("Cannot parse snippets")
+	}
+
+	stat, err := os.Stat(dir)
+
+	if err != nil && os.IsNotExist(err) {
+		os.MkdirAll(dir, 0755)
+	} else if err != nil {
+		return fmt.Errorf("Cannot create backup directory")
+	}
+
+	if !stat.IsDir() {
+		return fmt.Errorf("Backup directory is a file")
+	}
+
+	backupFile := filepath.Join(dir, fmt.Sprintf(".snippy_backup_%d", time.Now().Unix()))
+
+	err = os.WriteFile(backupFile, jsonData, 0644)
+
+	if err != nil {
+		return fmt.Errorf("Cannot write snippets")
+	}
+
+	return nil
 }
 
 func writeSnippetsToFile(data map[string]*Snippet, path string) {
