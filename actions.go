@@ -351,6 +351,14 @@ func InitAction(state *State) func(cCtx *cli.Context) error {
 	}
 }
 
+func BackupCreateAction(state *State) func(cCtx *cli.Context) error {
+	return nil
+}
+
+func BackupRestoreAction(state *State) func(cCtx *cli.Context) error {
+	return nil
+}
+
 func launchTextEditor(filepath string) error {
 	flag := ""
 

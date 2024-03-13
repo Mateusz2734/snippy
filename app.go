@@ -23,6 +23,7 @@ func NewApp(state *State, globalFlags []cli.Flag) *cli.App {
 			SearchCommand(state),
 			FavoriteCommand(state),
 			InitCommand(state),
+			BackupCommand(state),
 		},
 	}
 
