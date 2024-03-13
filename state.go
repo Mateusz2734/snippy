@@ -10,6 +10,7 @@ type State struct {
 	Name         string
 	Extension    string
 	Content      string
+	Directory    string
 	UseClipboard bool
 	CurrentPage  int
 	PageSize     int

@@ -115,3 +115,12 @@ func WithContent(state *State) cli.Flag {
 		Destination: &state.Content,
 	}
 }
+
+func WithDirectory(state *State) cli.Flag {
+	return &cli.StringFlag{
+		Name:        "directory",
+		Usage:       "Set the `DIR` of backup file.",
+		Aliases:     []string{"d", "dir"},
+		Destination: &state.Directory,
+	}
+}
