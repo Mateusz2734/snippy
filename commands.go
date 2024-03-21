@@ -12,7 +12,7 @@ func AddCommand(state *State) *cli.Command {
 		After:   saveFunc(state),
 		Action:  AddAction(state),
 		Flags: []cli.Flag{
-			WithInputFile(state),
+			WithInputFile(state, "Get snippets from `FILE`."),
 			WithName(state),
 			WithExtension(state),
 			WithClipboard(state),
@@ -164,7 +164,6 @@ func BackupCreateCommand(state *State) *cli.Command {
 		Usage:   "create backup",
 		Action:  BackupCreateAction(state),
 		Flags: []cli.Flag{
-			WithClipboard(state),
 			WithDirectory(state),
 		},
 	}
@@ -178,8 +177,7 @@ func BackupRestoreCommand(state *State) *cli.Command {
 		Action:  BackupRestoreAction(state),
 		After:   saveFunc(state),
 		Flags: []cli.Flag{
-			WithClipboard(state),
-			WithInputFile(state),
+			WithInputFile(state, "Get backup from `FILE`."),
 		},
 	}
 

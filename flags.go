@@ -2,10 +2,10 @@ package main
 
 import "github.com/urfave/cli/v2"
 
-func WithInputFile(state *State) cli.Flag {
+func WithInputFile(state *State, usage string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "file",
-		Usage:       "Set the content from `FILE` as the snippet.",
+		Usage:       usage,
 		Aliases:     []string{"f"},
 		Destination: &state.InputFile,
 	}
