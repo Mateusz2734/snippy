@@ -18,7 +18,7 @@ func TestNewApp(t *testing.T) {
 
 	assert.NotNil(t, app.Action, "app ActionFunc should not be nil")
 
-	assert.Len(t, app.Commands, 8, "app should have 8 commands")
+	assert.Len(t, app.Commands, 9, "app should have 9 commands")
 
 	assert.True(t, app.HideHelpCommand, "app should hide help command")
 }
