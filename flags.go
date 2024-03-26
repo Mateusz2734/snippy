@@ -94,7 +94,7 @@ func WithGlobal(state *State) cli.Flag {
 		Name:        "global",
 		Usage:       "Use global snippets.",
 		Aliases:     []string{"g"},
-		Destination: &state.UseGlobal,
+		Destination: &state.Global,
 	}
 }
 

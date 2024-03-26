@@ -15,19 +15,23 @@ type State struct {
 	CurrentPage  int
 	PageSize     int
 	NoMetadata   bool
-	UseGlobal    bool
+	Global       bool
 	NoFormatting bool
 }
 
+func (state *State) UseGlobal() bool {
+	return state.Global || state.localSnippets == nil
+}
+
 func (state *State) GetSnippets() map[string]*Snippet {
-	if state.UseGlobal || state.localSnippets == nil {
+	if state.UseGlobal() {
 		return state.globalSnippets
 	}
 	return state.localSnippets
 }
 
 func (state *State) SetSnippets(snippets map[string]*Snippet) {
-	if state.UseGlobal || state.localSnippets == nil {
+	if state.UseGlobal() {
 		state.globalSnippets = snippets
 	} else {
 		state.localSnippets = snippets

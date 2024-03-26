@@ -22,40 +22,64 @@ func TestNewState(t *testing.T) {
 
 	assert.False(t, state.UseClipboard, "UseClipboard should be false")
 	assert.False(t, state.NoMetadata, "NoMetadata should be false")
-	assert.False(t, state.UseGlobal, "UseGlobal should be false")
+	assert.False(t, state.Global, "UseGlobal should be false")
 	assert.False(t, state.NoFormatting, "NoFormatting should be false")
+}
+
+func TestUseGlobal(t *testing.T) {
+	state := NewState()
+
+	state.Global = true
+	state.localSnippets = nil
+	assert.True(t, state.UseGlobal(), "Should return true")
+
+	state.Global = true
+	state.localSnippets = make(map[string]*Snippet)
+	assert.True(t, state.UseGlobal(), "Should return true")
+
+	state.Global = false
+	state.localSnippets = nil
+	assert.True(t, state.UseGlobal(), "Should return true")
+
+	state.Global = false
+	state.localSnippets = make(map[string]*Snippet)
+	assert.False(t, state.UseGlobal(), "Should return false")
 }
 
 func TestGetSnippets(t *testing.T) {
 	state := NewState()
 
-	state.UseGlobal = true
+	state.Global = true
 	state.globalSnippets = make(map[string]*Snippet)
 	state.localSnippets = nil
 
 	assert.Equal(t, state.globalSnippets, state.GetSnippets(), "Should return globalSnippets")
 
-	state.UseGlobal = true
-	state.globalSnippets = nil
-	state.localSnippets = make(map[string]*Snippet)
-
-	assert.Equal(t, state.globalSnippets, state.GetSnippets(), "Should return globalSnippets")
-
-	state.UseGlobal = false
-	state.globalSnippets = map[string]*Snippet{"test": &Snippet{Content: "test"}}
-	state.localSnippets = make(map[string]*Snippet)
-
-	assert.Equal(t, state.localSnippets, state.GetSnippets(), "Should return localSnippets")
-
-	state.UseGlobal = false
-	state.globalSnippets = make(map[string]*Snippet)
-	state.localSnippets = nil
-
-	assert.Equal(t, state.globalSnippets, state.GetSnippets(), "Should return globalSnippets")
-
-	state.UseGlobal = false
+	state.Global = false
 	state.globalSnippets = nil
 	state.localSnippets = make(map[string]*Snippet)
 
 	assert.Equal(t, state.localSnippets, state.GetSnippets(), "Should return localSnippets")
+}
+
+func TestSetSnippets(t *testing.T) {
+	state := NewState()
+
+	globalSnippets := make(map[string]*Snippet)
+	localSnippets := make(map[string]*Snippet)
+	globalSnippets["global"] = &Snippet{Content: "global"}
+	localSnippets["local"] = &Snippet{Content: "local"}
+
+	state.Global = true
+	state.SetSnippets(globalSnippets)
+	assert.Equal(t, globalSnippets, state.globalSnippets, "Should set globalSnippets")
+	_, ok := state.globalSnippets["global"]
+	assert.True(t, ok, "Should contain 'global' snippet")
+
+	state.Global = false
+	state.localSnippets = make(map[string]*Snippet)
+	state.SetSnippets(localSnippets)
+	assert.Equal(t, localSnippets, state.localSnippets, "Should set localSnippets")
+	_, ok = state.localSnippets["local"]
+	assert.True(t, ok, "Should contain 'local' snippet")
 }
