@@ -132,6 +132,10 @@ func readSnippetsFromFile(path string) map[string]*Snippet {
 
 	err = json.Unmarshal(data, &snippets)
 
+	for key, snippet := range snippets {
+		snippet.Name = key
+	}
+
 	if err != nil {
 		cli.Exit("Cannot parse snippets", 1)
 	}
