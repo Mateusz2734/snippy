@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -540,4 +541,157 @@ func TestInitCommand(t *testing.T) {
 	assert.Empty(t, stdout.String(), "stdout should be empty")
 	assert.Contains(t, stderr.String(), "Snippy already initialized", "stderr should contain error message")
 
+}
+
+func TestBackupCommand(t *testing.T) {
+	_, app, stdout, stderr := SetupTestApp()
+
+	err := app.Run([]string{"snippy", "backup", "-h"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "USAGE", "stdout should contain help message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "backup"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "USAGE", "stdout should contain help message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "backup", "create", "-h"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "snippy backup create", "stdout should contain help message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "backup", "restore", "-h"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "snippy backup restore", "stdout should contain help message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+}
+
+func TestBackupCreateCommand(t *testing.T) {
+	// TODO: validate backup file
+	initialDir, _ := os.Getwd()
+	state, app, stdout, stderr := SetupTestApp()
+
+	dir := t.TempDir()
+	os.Chdir(dir)
+	defer os.Chdir(initialDir)
+
+	state.localSnippets["test"] = &Snippet{Content: "test content", Favorite: true, Extension: "test", CreatedAt: 1, UpdatedAt: 1}
+	state.globalSnippets["test1"] = &Snippet{Content: "test1 content", Favorite: false, Extension: "test1", CreatedAt: 1, UpdatedAt: 1}
+
+	err := app.Run([]string{"snippy", "backup", "create"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "Backup created successfully", "stdout should contain success message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+	matches := assertGlobFilesExist(t, dir, ".snippy_backup_*", 1, "backup file should be created")
+	os.Remove(matches[0])
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "backup", "create", "-g"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "Backup created successfully", "stdout should contain success message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+	assertGlobFilesExist(t, dir, ".snippy_backup_*", 1, "backup file should be created")
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "backup", "create", "-d", "./test"})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "Backup created successfully", "stdout should contain success message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+	assertGlobFilesExist(t, filepath.Join(dir, "test"), ".snippy_backup_*", 1, "backup file should be created")
+}
+
+func TestBackupRestoreCommand(t *testing.T) {
+	initialDir, _ := os.Getwd()
+	state, app, stdout, stderr := SetupTestApp()
+
+	dir := t.TempDir()
+	os.Chdir(dir)
+	defer os.Chdir(initialDir)
+
+	snippet := &Snippet{Content: "test content", Favorite: true, Extension: "test", CreatedAt: 1, UpdatedAt: 1}
+
+	snippetData := map[string]*Snippet{"test": snippet}
+
+	app.Run([]string{"snippy", "init"})
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err := CreateBackupFile(snippetData, dir)
+	matches := assertGlobFilesExist(t, dir, ".snippy_backup_*", 1, "backup file should be created")
+	assert.Nil(t, err, "error should be nil")
+
+	err = app.Run([]string{"snippy", "backup", "restore"})
+	assert.NotNil(t, err, "error should not be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Input file is required", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "backup", "restore", "-f", matches[0]})
+	assert.Nil(t, err, "error should be nil")
+	assert.Contains(t, stdout.String(), "Snippets restored successfully", "stdout should contain success message")
+	assert.Empty(t, stderr.String(), "stderr should be empty")
+	assert.Equal(t, snippet, state.localSnippets["test"], "snippet should be restored")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = app.Run([]string{"snippy", "backup", "restore", "-f", "./abc"})
+	assert.NotNil(t, err, "error should not be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Cannot read input file", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = os.WriteFile(matches[0], nil, 0644)
+	assert.Nil(t, err, "error should be nil")
+
+	err = app.Run([]string{"snippy", "backup", "restore", "-f", matches[0]})
+	assert.NotNil(t, err, "error should not be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Input file is empty", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
+	err = os.WriteFile(matches[0], []byte("test"), 0644)
+	assert.Nil(t, err, "error should be nil")
+
+	err = app.Run([]string{"snippy", "backup", "restore", "-f", matches[0]})
+	assert.NotNil(t, err, "error should not be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Cannot parse input file", "stderr should contain error message")
+}
+
+func assertGlobFilesExist(t *testing.T, basePath string, pattern string, expectedCount int, message string) []string {
+	matches, err := filepath.Glob(filepath.Join(basePath, pattern))
+	if err != nil {
+		assert.Fail(t, message)
+	}
+
+	if expectedCount != -1 && len(matches) != expectedCount {
+		assert.Fail(t, message)
+	}
+
+	for _, match := range matches {
+		assert.FileExists(t, match, message)
+	}
+
+	return matches
 }

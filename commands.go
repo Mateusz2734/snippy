@@ -185,7 +185,7 @@ func BackupRestoreCommand(state *State) *cli.Command {
 
 func saveFunc(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
-		WriteSnippets(state.GetSnippets(), state.UseGlobal || state.localSnippets == nil)
+		WriteSnippets(state.GetSnippets(), state.UseGlobal())
 		return nil
 	}
 }
