@@ -2,10 +2,10 @@ package main
 
 import "github.com/urfave/cli/v2"
 
-func WithInputFile(state *State) cli.Flag {
+func WithInputFile(state *State, usage string) cli.Flag {
 	return &cli.StringFlag{
 		Name:        "file",
-		Usage:       "Set the content from `FILE` as the snippet.",
+		Usage:       usage,
 		Aliases:     []string{"f"},
 		Destination: &state.InputFile,
 	}
@@ -94,7 +94,7 @@ func WithGlobal(state *State) cli.Flag {
 		Name:        "global",
 		Usage:       "Use global snippets.",
 		Aliases:     []string{"g"},
-		Destination: &state.UseGlobal,
+		Destination: &state.Global,
 	}
 }
 
@@ -113,5 +113,14 @@ func WithContent(state *State) cli.Flag {
 		Name:        "content",
 		Usage:       "Set the content of the snippet.",
 		Destination: &state.Content,
+	}
+}
+
+func WithDirectory(state *State) cli.Flag {
+	return &cli.StringFlag{
+		Name:        "directory",
+		Usage:       "Set the `DIR` of backup file.",
+		Aliases:     []string{"d", "dir"},
+		Destination: &state.Directory,
 	}
 }

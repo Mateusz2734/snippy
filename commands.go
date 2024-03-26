@@ -12,7 +12,7 @@ func AddCommand(state *State) *cli.Command {
 		After:   saveFunc(state),
 		Action:  AddAction(state),
 		Flags: []cli.Flag{
-			WithInputFile(state),
+			WithInputFile(state, "Get snippets from `FILE`."),
 			WithName(state),
 			WithExtension(state),
 			WithClipboard(state),
@@ -144,9 +144,48 @@ func InitCommand(state *State) *cli.Command {
 	}
 }
 
+func BackupCommand(state *State) *cli.Command {
+	return &cli.Command{
+		Name:            "backup",
+		Aliases:         []string{"b"},
+		Usage:           "perform backup operations",
+		HideHelpCommand: true,
+		Subcommands: []*cli.Command{
+			BackupCreateCommand(state),
+			BackupRestoreCommand(state),
+		},
+	}
+}
+
+func BackupCreateCommand(state *State) *cli.Command {
+	return &cli.Command{
+		Name:    "create",
+		Aliases: []string{"c"},
+		Usage:   "create backup",
+		Action:  BackupCreateAction(state),
+		Flags: []cli.Flag{
+			WithDirectory(state),
+		},
+	}
+}
+
+func BackupRestoreCommand(state *State) *cli.Command {
+	return &cli.Command{
+		Name:    "restore",
+		Aliases: []string{"r"},
+		Usage:   "restore snippets from backup file",
+		Action:  BackupRestoreAction(state),
+		After:   saveFunc(state),
+		Flags: []cli.Flag{
+			WithInputFile(state, "Get backup from `FILE`."),
+		},
+	}
+
+}
+
 func saveFunc(state *State) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
-		WriteSnippets(state.GetSnippets(), state.UseGlobal || state.localSnippets == nil)
+		WriteSnippets(state.GetSnippets(), state.UseGlobal())
 		return nil
 	}
 }
