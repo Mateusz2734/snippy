@@ -108,6 +108,11 @@ func AddAction(state *State) func(cCtx *cli.Context) error {
 			return cli.Exit("", 1)
 		}
 
+		if isCommand(state.Name) {
+			cCtx.App.ErrWriter.Write([]byte("Name cannot be a command\n"))
+			return cli.Exit("", 1)
+		}
+
 		if !termutil.Isatty(os.Stdin.Fd()) {
 			content, err = io.ReadAll(os.Stdin)
 		}
@@ -473,4 +478,11 @@ func sortByFavorite(snippets map[string]*Snippet, onlyFavorites bool) []string {
 	slices.Sort(rest)
 
 	return slices.Concat(favorites, rest)
+}
+
+func isCommand(name string) bool {
+	commands := []string{"add", "list", "get", "delete", "edit", "search", "favorite", "init", "backup"}
+	aliases := []string{"a", "l", "d", "e", "s", "f", "b"}
+
+	return slices.Contains(commands, name) || slices.Contains(aliases, name)
 }

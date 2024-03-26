@@ -181,6 +181,14 @@ func TestAddCommand(t *testing.T) {
 	stdout.Reset()
 	stderr.Reset()
 
+	err = app.Run([]string{"snippy", "add", "--name", "add", "--content", "test content"})
+	assert.NotNil(t, err, "error should not be nil")
+	assert.Empty(t, stdout.String(), "stdout should be empty")
+	assert.Contains(t, stderr.String(), "Name cannot be a command", "stderr should contain error message")
+
+	stdout.Reset()
+	stderr.Reset()
+
 	err = app.Run([]string{"snippy", "add", "-n", "test", "--e", "go", "--content", "test content"})
 	assert.Nil(t, err, "error should be nil")
 	assert.Contains(t, stdout.String(), "Snippet added successfully", "stdout should contain success message")
