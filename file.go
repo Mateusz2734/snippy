@@ -56,8 +56,12 @@ func CreateBackupFile(data map[string]*Snippet, dir string) error {
 
 	if err != nil && os.IsNotExist(err) {
 		os.MkdirAll(dir, 0755)
-	} else if err != nil {
-		return fmt.Errorf("Cannot create backup directory")
+	}
+
+	stat, err = os.Stat(dir)
+
+	if err != nil {
+		return fmt.Errorf("Cannot stat backup directory")
 	}
 
 	if !stat.IsDir() {
