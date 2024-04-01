@@ -1,7 +1,7 @@
 # snippy
 
 ## Introduction
-`snippy` is a CLI tool designed to help developers manage and utilize code snippets efficiently. With snippy, you can easily add, retrieve, edit, and organize your snippets, making code reuse a breeze.
+`snippy` is a CLI tool designed to help developers manage and utilize code snippets efficiently. With `snippy`, you can add, retrieve, edit, and organize your snippets, making code reuse a breeze. It is thoroughly tested (around 80% coverage) and easy to use.
 
 ## Available Commands
 - `snippy init` - Initialize local snippy source
